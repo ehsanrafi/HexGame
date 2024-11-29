@@ -24,7 +24,8 @@ public class Monaco implements IPlayer, IAuto {
     private int profunditat;
     private boolean timeout = false;
     private PlayerType Jugador;
-    private long jugadesEsperades = 0;
+    private PlayerType JugadorEnemic;
+    private long jugadesExplorades = 0;
     private int profMax = 0;
     
 
@@ -52,25 +53,101 @@ public class Monaco implements IPlayer, IAuto {
         Point puntOptim = new Point();
         Point punt;
         Jugador = s.getCurrentPlayer();
+        JugadorEnemic = Jugador == PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
         
-        for(int i=0;i<s.getSize();i++){
-          for(int j=0;j<s.getSize();j++){
-              
-              if (s.getPos(i,j) == 0){
-                  punt = new Point(i,j);
-                  HexGameStatus AuxBoard = new HexGameStatus(s);
-                  AuxBoard.placeStone(punt);
+        for(int i=0;i<s.getSize();i++) {
+            for(int j=0;j<s.getSize();j++) {
+                if (s.getPos(i,j) == 0) {
+                    punt = new Point(i,j);
+                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    AuxBoard.placeStone(punt);
                   
-                  if (AuxBoard.GetWinner() == Jugador){
-                      return new PlayerMove(punt, jugadesEsperades, profMax, mode == true ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
-                  }
-              }
+                    if (AuxBoard.GetWinner() == Jugador){
+                        return new PlayerMove(punt, jugadesExplorades, profMax, mode == true ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+                    }
+
+                    int valor;
+                    if(mode) {
+                        //MINIMAX_IDS
+                    }
+                    else {
+                        //MINIMAX
+                        valor = MiniMax(s, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+
+
+                    }
+
+                    // No sé si meterlo dentro de los ifs o aquí fuera
+                    if(valor > valorMesAlt) {
+                        valorMesAlt = valor;
+                        puntOptim = punt;
+                    }
+                }
             }  
         }
         
-        return puntOptim;
+        return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode == true ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
     }
 
+    public int MiniMax(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
+        if(s.isGameOver() || profunditat == 0) {
+            if(s.GetWinner() == Jugador) {
+                return 1000; //ejemplo de heurística, no definitivo
+            } else if(s.GetWinner() == JugadorEnemic) {
+                return -1000;
+            } else {
+                return getHeuristica(s);
+            }
+        }
+        
+        int valor;
+        
+        if(mode) {
+            if(maxJugador) {
+
+            } else {
+                
+            }
+        } else {
+            if (maxJugador) {
+                valor = Integer.MIN_VALUE;
+                
+                for(int i = 0; i < s.getSize(); ++i) {
+                    for(int j = 0; j < s.getSize(); ++j) {
+                        if (s.getPos(i, j) == 0) {
+                            //punt = new Point(i,j);
+                            HexGameStatus AuxBoard = new HexGameStatus(s);
+                            AuxBoard.placeStone(new Point(i, j));
+                            
+                            valor = Math.max(valor, MiniMax(AuxBoard, alfa, beta, profunditat - 1, false));
+                            
+                            if (beta <= valor) return valor;
+                            alfa = Math.max(valor, alfa);
+                        }
+                    }
+                }
+            } else {
+                valor = Integer.MAX_VALUE;
+                
+                for(int i = 0; i < s.getSize(); ++i) {
+                    for(int j = 0; j < s.getSize(); ++j) {
+                        if (s.getPos(i, j) == 0) {
+                            //punt = new Point(i,j);
+                            HexGameStatus AuxBoard = new HexGameStatus(s);
+                            AuxBoard.placeStone(new Point(i, j));
+                            
+                            valor = Math.min(valor, MiniMax(AuxBoard, alfa, beta, profunditat - 1, true));
+                            
+                            if (valor <= alfa) return valor;
+                            beta = Math.min(valor, beta);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return valor;
+    }
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
      * de joc.

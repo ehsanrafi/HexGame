@@ -131,7 +131,7 @@ public class Monaco implements IPlayer, IAuto {
         
         for(int pActual = 1; pActual <= profunditat; ++pActual) {
             if(!timeout) {
-                millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat, mode);
+                millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, false);
                 profMax = pActual;
             } else {
                 break;

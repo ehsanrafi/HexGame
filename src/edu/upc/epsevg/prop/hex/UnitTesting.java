@@ -15,12 +15,7 @@ import edu.upc.epsevg.prop.hex.players.ProfeGameStatus3.Result;
  * @author bernat
  */
 public class UnitTesting {
-    
-    
-    
     public static void main(String[] args) {
-    
-        
         byte[][] board = {
         //X   0  1  2  3  4  5  6  7  8
             { 0, 0, 0, 0,  0, 0, 0, 0, 0},                     // 0   Y
@@ -35,11 +30,8 @@ public class UnitTesting {
         };
 
 
-        HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);        
+        HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
         
- 
     }
-    
-    // Proves
     
 }

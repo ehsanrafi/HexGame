@@ -125,11 +125,19 @@ public class Monaco implements IPlayer, IAuto {
     }
     
     public int minimaxIDS(HexGameStatus s, int profunditat) {
+        //falta hacer que cuando se haga el timeout, si no ha acabado de hacer toda
+        //la busqueda que se quede con el valor anterior
         int millorValor = 0;
         
         for(int pActual = 1; pActual <= profunditat; ++pActual) {
-            if(!timeout) millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat, mode);
+            if(!timeout) {
+                millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat, mode);
+                profMax = pActual;
+            } else {
+                break;
+            }
         }
+        
         return millorValor;
     }
     

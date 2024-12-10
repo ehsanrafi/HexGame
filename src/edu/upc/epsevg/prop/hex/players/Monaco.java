@@ -39,6 +39,12 @@ public class Monaco implements IPlayer, IAuto {
         timeout = true;
     }
 
+    //OPTIMITZACIÓ IDS
+    /*
+    Si ves que con i = 1, el mejor nodo es el tercero, con i = 2, empieza por el tercero.
+    Para saber si un nodo es una repeticción, usar hash table --> adaptar zobrist hashing
+    */
+    
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que
      * ha de posar.
@@ -104,6 +110,7 @@ public class Monaco implements IPlayer, IAuto {
                 HexGameStatus AuxBoard = new HexGameStatus(s);
                 AuxBoard.placeStone(p);
                 
+                //timeout
                 valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
                 
                 alfa = Math.max(alfa, valor);
@@ -115,6 +122,7 @@ public class Monaco implements IPlayer, IAuto {
                 HexGameStatus AuxBoard = new HexGameStatus(s);
                 AuxBoard.placeStone(p);
                 
+                //timeout
                 valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
                 
                 beta = Math.min(beta, valor);
@@ -128,16 +136,19 @@ public class Monaco implements IPlayer, IAuto {
         //falta hacer que cuando se haga el timeout, si no ha acabado de hacer toda
         //la busqueda que se quede con el valor anterior
         int millorValor = 0;
+        int millorValorAux = 0;
         
         for(int pActual = 1; pActual <= profunditat; ++pActual) {
             if(!timeout) {
+                millorValorAux = millorValor;
                 millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, false);
-                profMax = pActual;
             } else {
-                break;
+                profMax = pActual - 1;
+                return millorValorAux;
             }
         }
         
+        profMax = profunditat;
         return millorValor;
     }
     

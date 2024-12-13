@@ -94,9 +94,9 @@ public class Monaco implements IPlayer, IAuto {
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
         if(s.isGameOver() || profunditat == 0) {
             if(s.GetWinner() == Jugador) {
-                return 1000; //ejemplo de heurística, no definitivo
+                return 1000000; //ejemplo de heurística, no definitivo
             } else if(s.GetWinner() == JugadorEnemic) {
-                return -1000;
+                return -1000000;
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
@@ -157,7 +157,7 @@ public class Monaco implements IPlayer, IAuto {
         int distJugador = calcularDistancia(s, Jugador);
         int distOponent = calcularDistancia(s, JugadorEnemic);
         
-        return distJugador - distOponent;
+        return distOponent - distJugador;
     }
     
     public int calcularDistancia(HexGameStatus s, PlayerType p) {

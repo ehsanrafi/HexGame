@@ -11,6 +11,8 @@ import edu.upc.epsevg.prop.hex.SearchType;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 
 /**
@@ -18,7 +20,6 @@ import java.util.Random;
  * @author bernat
  */
 public class Monaco implements IPlayer, IAuto {
-
     private String name;
     private boolean mode;
     private int profunditat;
@@ -65,7 +66,7 @@ public class Monaco implements IPlayer, IAuto {
             
             int valor;
             if(mode) {
-                valor = minimaxIDS(AuxBoard, profunditat);
+                valor = minimaxIDS(s);
             } else {
                 valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
             }
@@ -94,61 +95,83 @@ public class Monaco implements IPlayer, IAuto {
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
         if(s.isGameOver() || profunditat == 0) {
             if(s.GetWinner() == Jugador) {
-                return 1000000; //ejemplo de heurística, no definitivo
+                return X; //falta numero
             } else if(s.GetWinner() == JugadorEnemic) {
-                return -1000000;
+                return X;// falta numero
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
             }
         }
         
-        int valor;
-        if(maxJugador) {
-            valor = Integer.MIN_VALUE;
-            for(Point p : getValidMoves(s)) {
-                HexGameStatus AuxBoard = new HexGameStatus(s);
-                AuxBoard.placeStone(p);
-                
-                //timeout
-                valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
-                
-                alfa = Math.max(alfa, valor);
-                if (alfa >= beta) break;
-            }
-        } else {
-            valor = Integer.MAX_VALUE;
-            for(Point p : getValidMoves(s)) {
-                HexGameStatus AuxBoard = new HexGameStatus(s);
-                AuxBoard.placeStone(p);
-                
-                //timeout
-                valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
-                
-                beta = Math.min(beta, valor);
-                if (alfa >= beta) break;
+        int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        if((mode && !timeout) || !mode) {
+            if(maxJugador) {
+                for(Point p : getValidMoves(s)) {
+                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    AuxBoard.placeStone(p);
+
+                    valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
+
+                    alfa = Math.max(alfa, valor);
+                    if (alfa >= beta) break;
+                }
+            } else {
+                for(Point p : getValidMoves(s)) {
+                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    AuxBoard.placeStone(p);
+
+                    valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
+
+                    beta = Math.min(beta, valor);
+                    if (alfa >= beta) break;
+                }
             }
         }
         return valor;
-    }
-    
-    public int minimaxIDS(HexGameStatus s, int profunditat) {
-        //falta hacer que cuando se haga el timeout, si no ha acabado de hacer toda
-        //la busqueda que se quede con el valor anterior
-        int millorValor = 0;
-        int millorValorAux = 0;
         
-        for(int pActual = 1; pActual <= profunditat; ++pActual) {
-            if(!timeout) {
-                millorValorAux = millorValor;
-                millorValor = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, false);
-            } else {
-                profMax = pActual - 1;
-                return millorValorAux;
+        /*
+        if((mode && !timeout) || !mode) {
+            for (int i = 0; i < s.getSize(); ++i) {
+                for (int j = 0; j < s.getSize(); ++j) {
+                    if(s.getPos(i, j) == 0) {
+                        HexGameStatus AuxBoard = new HexGameStatus(s);
+                        AuxBoard.placeStone(new Point(i, j));
+                        
+                        if(maxJugador) {
+                            valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
+                            alfa = Math.max(alfa, valor); 
+                        } else {
+                            valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
+                            beta = Math.min(beta, valor);
+                        }
+                        
+                        if (alfa >= beta) break;
+                    }
+                }
             }
         }
         
-        profMax = profunditat;
+        return valor;
+        */
+    }
+    
+    public int minimaxIDS(HexGameStatus s) {
+        //falta guardar primer movimiento del bucle anterior
+        int millorValor = 0;
+        int millorValorAux = 0;
+        
+        for(int pActual = 1; pActual < Integer.MAX_VALUE; ++pActual) {
+            if(!timeout) {
+                millorValor = millorValorAux;
+                millorValorAux = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, true);
+            } else {
+                profMax = pActual - 1;
+                break;
+            }
+        }
+        
         return millorValor;
     }
     
@@ -163,78 +186,63 @@ public class Monaco implements IPlayer, IAuto {
     public int calcularDistancia(HexGameStatus s, PlayerType p) {
         int mida = s.getSize();
         int[][] dist = new int[mida][mida];
-        boolean[][] visited = new boolean[mida][mida];
-        //final int INFINIT = Integer.MAX_VALUE;
+        boolean[][] visitat = new boolean[mida][mida];
+        Queue<Point> queue = new PriorityQueue<>((a, b) -> dist[a.x][a.y] - dist[b.x][b.y]);
         
+        //inicializar distancias
         for (int i = 0; i < mida; ++i) {
             for (int j = 0; j < mida; ++j) {
                 dist[i][j] = Integer.MAX_VALUE;
-            }
-        }
-        
-        List<Point> queue = new ArrayList<>();
-        
-        if(p == PlayerType.PLAYER1) {
-           for (int i = 0; i < mida; ++i) {
-               if (s.getPos(0, i) == 0 || s.getPos(0, i) == PlayerType.getColor(p)) {
-                   dist[0][i] = 0;
-                   queue.add(new Point(0, i));
-               }
-           }
-        } else if (p == PlayerType.PLAYER2) {
-           for (int i = 0; i < mida; ++i) {
-               if (s.getPos(i, 0) == 0 || s.getPos(i, 0) == PlayerType.getColor(p)) {
-                   dist[i][0] = 0;
-                   queue.add(new Point(i, 0));
-               }
-           }
-        }
-        
-        while(!queue.isEmpty()) {
-            Point pCurrent = queue.remove(0);
-            int x = pCurrent.x;
-            int y = pCurrent.y;
-            
-            if (visited[x][y]) continue;
-            visited[x][y] = true;
-            
-            for (Point pN  : getAdjacents(x, y, mida)) {
-                int cost = (s.getPos(pN) == 0 || s.getPos(pN) == PlayerType.getColor(p) ? 1 : 10);
-                int newDist = dist[x][y] + cost;
-                
-                if(newDist < dist[pN.x][pN.y]) {
-                    dist[pN.x][pN.y] = newDist;
-                    queue.add(pN);
+                if((p == PlayerType.PLAYER1 && i == 0) || (p == PlayerType.PLAYER2 && j == 0)) {
+                    dist[i][j] = 0;
+                    queue.add(new Point(i, j));
                 }
             }
         }
         
-        int minimumDist = Integer.MAX_VALUE;
-        
-        if(p == PlayerType.PLAYER1) {
-            for (int i = 0; i < mida; ++i) {
-                minimumDist = Math.min(minimumDist, dist[mida - 1][i]);
-            }
-        } else if(p == PlayerType.PLAYER2) {
-            for (int i = 0; i < mida; ++i) {
-                minimumDist = Math.min(minimumDist, dist[i][mida - 1]);
-            } 
-        }
-        return minimumDist == Integer.MAX_VALUE ? 1000 : minimumDist;
-    }
+        //algorismo más o menos dijkstra
+        while(!queue.isEmpty()) {
+            Point punt = queue.poll();
+            if (visitat[punt.x][punt.y]) continue;
+            visitat[punt.x][punt.y] = true;
 
-    public List<Point> getAdjacents(int x, int y, int mida) {
-        List<Point> Neighbours = new ArrayList<>();
-        int[][] direccions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}};
-        
-        for(int[] dir : direccions) {
-            int nx = x + dir[0], ny = y + dir[1];
-            
-            if(nx >= 0 && nx < mida && ny >= 0 && ny < mida) {
-                Neighbours.add(new Point(nx, ny));
-            }  
+            for (Point v : getVeins(punt, mida)) {
+                if (s.getPos(v.x, v.y) == PlayerType.getColor(p) || s.getPos(v.x, v.y) == 0) {
+                    int novaDist = dist[punt.x][punt.y] + 1;
+                    if (novaDist < dist[v.x][v.y]) {
+                        dist[v.x][v.y] = novaDist;
+                        queue.add(v);
+                    }
+                }
+            }
         }
-        return Neighbours;
+        
+        //buscant distancia minima al costat oposat
+        int minDist = Integer.MAX_VALUE;
+        for (int i = 0; i < mida; i++) {    
+            for (int j = 0; j < mida; j++) {
+                if ((p == PlayerType.PLAYER1 && i == s.getSize() - 1) || (p == PlayerType.PLAYER2 && j == s.getSize() - 1)) {
+                    minDist = Math.min(minDist, dist[i][j]);
+                }
+            }
+        }
+
+         return minDist;
+    }
+    
+    public List<Point> getVeins(Point p, int m) {
+        int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}};
+        List<Point> v = new ArrayList<>();
+        for (int[] d : dir) {
+            int x = p.x + d[0];
+            int y = p.y + d[1];
+            
+            if(x >= 0 && x < m && y >= 0 && y < m) {
+                v.add(new Point(x, y));
+            }
+        }
+        
+        return v;
     }
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps

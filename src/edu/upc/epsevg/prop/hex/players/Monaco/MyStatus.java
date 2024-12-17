@@ -20,7 +20,7 @@ public class MyStatus extends HexGameStatus {
     
     public MyStatus(HexGameStatus hgs) {
         super(hgs);
-        this.hash = hgs.hash; //puede que haya que hacer un private int hash en HexGameStatus
+        //this.hash = hgs.hash; //puede que haya que hacer un private int hash en HexGameStatus
         
         for (int x = 0; x < super.getSize(); x++) {
             for (int y = 0; y < super.getSize(); y++) {
@@ -31,6 +31,7 @@ public class MyStatus extends HexGameStatus {
         }
     }
     
+    /*
     @Override
     public void placeStone(Point p) {
         super.placeStone(p);
@@ -38,4 +39,5 @@ public class MyStatus extends HexGameStatus {
         hashActual ^= zobristTable[x][y][estadoNuevo];
         return hashActual;
     }
+*/
 }

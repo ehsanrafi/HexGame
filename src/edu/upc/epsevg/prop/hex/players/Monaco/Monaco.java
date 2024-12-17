@@ -153,7 +153,7 @@ public class Monaco implements IPlayer, IAuto {
     
     public int getHeuristica(HexGameStatus s) {
         Dijkstra dGraf = new Dijkstra(s);
-        
+        return 0;
     }
     
     /**

@@ -21,16 +21,16 @@ public class Node {
         this.dist = dist;
     }
     
-    public int getX(Node n) {
-        return n.x;
+    public int getX() {
+        return this.x;
     }
     
-    public int getY(Node n) {
-        return n.y;
+    public int getY() {
+        return this.y;
     }
     
-    public int getDistance(Node n) {
-        return n.dist;
+    public int getDistance() {
+        return this.dist;
     }
     
     public void setX(int x) {

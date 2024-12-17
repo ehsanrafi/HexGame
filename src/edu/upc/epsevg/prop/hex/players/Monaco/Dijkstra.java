@@ -25,7 +25,8 @@ public class Dijkstra extends HexGameStatus {
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(node -> node.getDistance()));
         
         //comprovació de que el nodo final no esté ocupado por el otro
-        if((hgs.getPos(sPoint) != 0 && hgs.getPos(sPoint) != PlayerType.getColor(p)) || (hgs.getPos(tPoint) != 0 && hgs.getPos(tPoint) != PlayerType.getColor(p))) {
+        if((hgs.getPos(sPoint) != 0 && hgs.getPos(sPoint) != PlayerType.getColor(p)) ||
+           (hgs.getPos(tPoint) != 0 && hgs.getPos(tPoint) != PlayerType.getColor(p))) {
             return Integer.MAX_VALUE;
         }
         

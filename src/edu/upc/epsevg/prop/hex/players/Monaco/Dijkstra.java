@@ -72,7 +72,7 @@ public class Dijkstra extends HexGameStatus {
             }
         }
         
-        return -1;
+        return Integer.MAX_VALUE;
     }
     
 }

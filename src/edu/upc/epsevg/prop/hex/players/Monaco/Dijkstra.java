@@ -11,9 +11,11 @@ import java.util.PriorityQueue;
  * @author Ehsan i Iván
  */
 public class Dijkstra extends HexGameStatus {
+    private final HexGameStatus hgs;
     
     public Dijkstra(HexGameStatus hgs) {
         super(hgs);
+        this.hgs = hgs;
     }
     
     public int getDistance(HexGameStatus hgs, PlayerType p, Point sPoint, Point tPoint) {
@@ -21,6 +23,12 @@ public class Dijkstra extends HexGameStatus {
         int[][] dist = new int[mida][mida];
         boolean[][] visited = new boolean[mida][mida];
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(node -> node.getDistance()));
+        
+        //comprovació de que el nodo final no esté ocupado por el otro
+        if((hgs.getPos(sPoint) != 0 && hgs.getPos(sPoint) != PlayerType.getColor(p)) || (hgs.getPos(tPoint) != 0 && hgs.getPos(tPoint) != PlayerType.getColor(p))) {
+            return Integer.MAX_VALUE;
+        }
+        
         
         for (int i = 0; i < mida; ++i) {
             for (int j = 0; j < mida; ++j) {
@@ -51,8 +59,9 @@ public class Dijkstra extends HexGameStatus {
                 int ny = pCurrent.y + d[1];
                 
                 if (nx >= 0 && nx < mida && ny >= 0 && ny < mida && !visited[nx][ny]) {
+                    int c = hgs.getPos(nx, ny) == 0 ? 1 : 0; //coste
                     if (hgs.getPos(nx, ny) == 0 || hgs.getPos(nx, ny) == PlayerType.getColor(p)) {
-                        int newDist = dist[pCurrent.x][pCurrent.y] + 1;
+                        int newDist = dist[pCurrent.x][pCurrent.y] + c;
                         if (newDist < dist[nx][ny]) {
                             dist[nx][ny] = newDist;
                             queue.add(new Node(nx, ny, newDist));

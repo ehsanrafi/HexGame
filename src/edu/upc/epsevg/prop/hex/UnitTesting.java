@@ -24,21 +24,22 @@ public class UnitTesting {
     public static void main(String[] args) {
         byte[][] board = {
         //X   0  1  2  3  4  5  6  7  8
-            { 0, 0, 0, 0,  0, 0, 0, 0, 0},                     // 0   Y
-              { 0, 0, 0, 0, 0, 0, 0, 0, 0},                    // 1
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0},                  // 2
-                  { 0, 0, 0, 0, 0, 0, 0, 0, 0},                // 3
-                    { 0, 0, 0, 0,-1, 0, 0, 0, 0},              // 4  
-                      { 0, 0, 0, 0, 0, 1, 0, 0, 0},            // 5    
-                        { 0, 0, 0,-1,-1,-1, 1,-1, 0},          // 6      
-                          { 0, 0, 1, 1, 1, 1,-1, 1, 0},        // 7       
-                            { 0, 0, 0, 0, 0, 0,-1, 0, 1}       // 8    Y         
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0},                     // 0   Y
+              { 1, 0, 0, 0, 0, 0, 0, 0, 0},                    // 1
+                { 1, 0, 0, 0, 0, 0, 0, 0, 1},                  // 2
+                  { 1, 0, 0, 0, 0, 0, 0, 0, 0},                // 3
+                    { 1, 0, 0, 0,-1, 0, 0, 0, 0},              // 4
+                      { 1, 0, 0, 0, 0, 1, 0, 0, 0},            // 5
+                        { 1, 0, 0,-1,-1,-1, 1,-1, 0},          // 6
+                          { 1, 0, 1, 1, 1, 1,-1, 1, 0},        // 7
+                            { 1, 0, 0, 0, 0, 0,-1, 0, 1}       // 8    Y
         };
 
+        //System.out.println("ocupa: " + board[4][4]);
 
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
         Dijkstra d = new Dijkstra(gs);
-        //int n = (gs);
-        System.out.println(PlayerType.getColor(PlayerType.PLAYER1));
+        int n = d.getDistance(gs, PlayerType.PLAYER2, new Point(6, 8), new Point(4, 4));
+        System.out.println("Distància: " + n);
     }
 }

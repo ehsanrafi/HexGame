@@ -6,7 +6,7 @@ import edu.upc.epsevg.prop.hex.IPlayer;
 import edu.upc.epsevg.prop.hex.IPlayer;
 import edu.upc.epsevg.prop.hex.IPlayer;
 import edu.upc.epsevg.prop.hex.players.H_E_X_Player;
-import edu.upc.epsevg.prop.hex.players.Monaco;
+import edu.upc.epsevg.prop.hex.players.Monaco.Monaco;
 
 
 
@@ -27,11 +27,13 @@ public class Game {
             public void run() {
                 
                 //IPlayer player1 = new H_E_X_Player(2/*GB*/);
-                IPlayer player1 = new RandomPlayer("Random");
+                //IPlayer player1 = new RandomPlayer("Random");
+                IPlayer player1 = new Monaco("Monaco2023", true, 8);
                 
-                IPlayer player2 = new Monaco("Monaco2023", true, 8);
+                //IPlayer player2 = new Monaco("Monaco2023", true, 8);
+                IPlayer player2 = new H_E_X_Player(2/*GB*/);
                                 
-                new Board(player1 , player2, 5 /*mida*/,  5/*s*/, false);
+                new Board(player1 , player2, 4 /*mida*/,  5/*s*/, false);
              }
         });
     }

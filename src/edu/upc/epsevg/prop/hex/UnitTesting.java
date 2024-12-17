@@ -14,6 +14,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 /**
  *
  * @author bernat
@@ -39,94 +40,73 @@ public class UnitTesting {
         System.out.println("Heuristic: " + n);
     }
         
-        static int getHeuristica(HexGameStatus s) {
-            int playerShortestPath = getShortestPath(s, PlayerType.PLAYER1);
-            int opponentShortestPath = getShortestPath(s, PlayerType.PLAYER2);
-            return opponentShortestPath - playerShortestPath;
+    static public int getHeuristica(HexGameStatus s) {
+        
+        int distJugador = calcularDistancia(s, PlayerType.PLAYER1);
+        int distOponent = calcularDistancia(s, PlayerType.PLAYER2);
+        
+        return distOponent - distJugador;
+    }
+    
+    static public int calcularDistancia(HexGameStatus s, PlayerType p) {
+        int mida = s.getSize();
+        int[][] dist = new int[mida][mida];
+        boolean[][] visitat = new boolean[mida][mida];
+        Queue<Point> queue = new PriorityQueue<>((a, b) -> dist[a.x][a.y] - dist[b.x][b.y]);
+        
+        //inicializar distancias
+        for (int i = 0; i < mida; ++i) {
+            for (int j = 0; j < mida; ++j) {
+                dist[i][j] = Integer.MAX_VALUE;
+                if((p == PlayerType.PLAYER1 && i == 0) || (p == PlayerType.PLAYER2 && j == 0)) {
+                    dist[i][j] = 0;
+                    queue.add(new Point(i, j));
+                }
+            }
         }
+        
+        //algorismo más o menos dijkstra
+        while(!queue.isEmpty()) {
+            Point punt = queue.poll();
+            if (visitat[punt.x][punt.y]) continue;
+            visitat[punt.x][punt.y] = true;
 
-        static int getShortestPath(HexGameStatus s, PlayerType player) {
-            PriorityQueue<Node> queue = new PriorityQueue<>((a, b) -> Integer.compare(a.distance, b.distance));
-            boolean[][] visited = new boolean[s.getSize()][s.getSize()];
-            int[][] distances = new int[s.getSize()][s.getSize()];
-
-            for (int i = 0; i < s.getSize(); i++) {
-                for (int j = 0; j < s.getSize(); j++) {
-                    distances[i][j] = Integer.MAX_VALUE;
-                }
-            }
-
-            // Initialize start nodes (borders based on player)
-            if (player == PlayerType.PLAYER1) {
-                for (int i = 0; i < s.getSize(); i++) {
-                    queue.add(new Node(0, i, 0));
-                    distances[0][i] = 0;
-                }
-            } else {
-                for (int i = 0; i < s.getSize(); i++) {
-                    queue.add(new Node(i, 0, 0));
-                    distances[i][0] = 0;
-                }
-            }
-
-            while (!queue.isEmpty()) {
-                Node current = queue.poll();
-
-                if (visited[current.x][current.y]) continue;
-                visited[current.x][current.y] = true;
-
-                for (Point neighbor : getNeighbors(current.x, current.y, s)) {
-                    int nx = neighbor.x;
-                    int ny = neighbor.y;
-
-                    if (!visited[nx][ny] && s.getPos(nx, ny) != PlayerType.opposite(player).ordinal()) {
-                        int newDist = distances[current.x][current.y] + (s.getPos(nx, ny) == player.ordinal() ? 0 : 1);
-                        if (newDist < distances[nx][ny]) {
-                            distances[nx][ny] = newDist;
-                            queue.add(new Node(nx, ny, newDist));
-                        }
+            for (Point v : getVeins(punt, mida)) {
+                if (s.getPos(v.x, v.y) == PlayerType.getColor(p) || s.getPos(v.x, v.y) == 0) {
+                    int novaDist = dist[punt.x][punt.y] + 1;
+                    if (novaDist < dist[v.x][v.y]) {
+                        dist[v.x][v.y] = novaDist;
+                        queue.add(v);
                     }
                 }
             }
-
-            // Find the shortest path to the opposite border
-            int shortestPath = Integer.MAX_VALUE;
-            if (player == PlayerType.PLAYER1) {
-                for (int i = 0; i < s.getSize(); i++) {
-                    shortestPath = Math.min(shortestPath, distances[s.getSize() - 1][i]);
-                }
-            } else {
-                for (int i = 0; i < s.getSize(); i++) {
-                    shortestPath = Math.min(shortestPath, distances[i][s.getSize() - 1]);
+        }
+        
+        //buscant distancia minima al costat oposat
+        int minDist = Integer.MAX_VALUE;
+        for (int i = 0; i < mida; i++) {    
+            for (int j = 0; j < mida; j++) {
+                if ((p == PlayerType.PLAYER1 && i == s.getSize() - 1) || (p == PlayerType.PLAYER2 && j == s.getSize() - 1)) {
+                    minDist = Math.min(minDist, dist[i][j]);
                 }
             }
-
-            return shortestPath;
         }
 
-        static List<Point> getNeighbors(int x, int y, HexGameStatus s) {
-            List<Point> neighbors = new ArrayList<>();
-            int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}};
-
-            for (int[] dir : directions) {
-                int nx = x + dir[0];
-                int ny = y + dir[1];
-
-                if (nx >= 0 && ny >= 0 && nx < s.getSize() && ny < s.getSize()) {
-                    neighbors.add(new Point(nx, ny));
-                }
-            }
-
-            return neighbors;
-        }
+        return minDist;
+    }
     
-        private static class Node {
-            int x, y, distance;
-
-            Node(int x, int y, int distance) {
-                this.x = x;
-                this.y = y;
-                this.distance = distance;
+    static public List<Point> getVeins(Point p, int m) {
+        int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}};
+        List<Point> v = new ArrayList<>();
+        for (int[] d : dir) {
+            int x = p.x + d[0];
+            int y = p.y + d[1];
+            
+            if(x >= 0 && x < m && y >= 0 && y < m) {
+                v.add(new Point(x, y));
             }
         }
+        
+        return v;
+    }
 }

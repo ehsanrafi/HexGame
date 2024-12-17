@@ -4,7 +4,7 @@ package edu.upc.epsevg.prop.hex;
 
 import edu.upc.epsevg.prop.hex.players.H_E_X_Player;
 import edu.upc.epsevg.prop.hex.players.HumanPlayer;
-import edu.upc.epsevg.prop.hex.players.Monaco;
+import edu.upc.epsevg.prop.hex.players.Monaco.Monaco;
 import edu.upc.epsevg.prop.hex.players.RandomPlayer;
 import java.lang.ref.WeakReference;
 

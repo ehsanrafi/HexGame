@@ -152,48 +152,15 @@ public class Monaco implements IPlayer, IAuto {
     */
     
     public int getHeuristica(HexGameStatus s) {
-        /*
         Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
         Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
-        int PlayerScore = Integer.MAX_VALUE;
-        int EnemicScore = Integer.MAX_VALUE;
-
-        int AuxValueJugador = Integer.MAX_VALUE;
-        int AuxValueEnemic = Integer.MAX_VALUE;
-        if(Jugador == PlayerType.PLAYER1) { //jugador = lados verticales, enemigo = lados horizontales
-            for(int i = 0; i < s.getSize(); ++i) {
-                for(int j = 0; j < s.getSize(); ++j) {
-                    AuxValueJugador = dGrafJugador.getDistance(new Point(i, 0), new Point(j, s.getSize() - 1));
-                    AuxValueEnemic = dGrafEnemic.getDistance(new Point(0, i), new Point(s.getSize() - 1, j));
-                }
-                
-                if(AuxValueJugador < PlayerScore) {
-                    PlayerScore = AuxValueJugador;
-                }
-                
-                if(AuxValueEnemic < EnemicScore) {
-                    EnemicScore = AuxValueEnemic;
-                }
-            }
-        } else {
-            if(Jugador == PlayerType.PLAYER1) {
-                for(int i = 0; i < s.getSize(); ++i) {
-                    for(int j = 0; j < s.getSize(); ++j) {
-                        AuxValueEnemic = dGrafEnemic.getDistance(new Point(i, 0), new Point(j, s.getSize() - 1));
-                        AuxValueJugador = dGrafJugador.getDistance(new Point(0, i), new Point(s.getSize() - 1, j));
-                    }
-
-                    if(AuxValueJugador < PlayerScore) {
-                        PlayerScore = AuxValueJugador;
-                    }
-
-                    if(AuxValueEnemic < EnemicScore) {
-                        EnemicScore = AuxValueEnemic;
-                    }
-                }
-            }
-        }
+        int PlayerScore = dGrafJugador.shortestPath();
+        int EnemicScore = dGrafEnemic.shortestPath();
         
+        if(PlayerScore == Integer.MAX_VALUE) 
+            return Integer.MIN_VALUE;
+        if(EnemicScore == Integer.MAX_VALUE)
+            return Integer.MAX_VALUE;
         //heuristica mala
         return EnemicScore - PlayerScore;
         
@@ -203,8 +170,6 @@ public class Monaco implements IPlayer, IAuto {
         //int PlayerScore = dGrafJugador.getDistance(s, Jugador, sPoint, tPoint);
         //int OpponentScore = dGrafEnemic.getDistance(s, Jugador, sPoint, tPoint);
         //y luego aplicar la heuristica 2
-        */
-        return 0;
     }
     
     

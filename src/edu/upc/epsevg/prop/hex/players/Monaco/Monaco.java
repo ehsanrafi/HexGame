@@ -152,6 +152,7 @@ public class Monaco implements IPlayer, IAuto {
     */
     
     public int getHeuristica(HexGameStatus s) {
+        /*
         Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
         Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
         int PlayerScore = Integer.MAX_VALUE;
@@ -202,6 +203,8 @@ public class Monaco implements IPlayer, IAuto {
         //int PlayerScore = dGrafJugador.getDistance(s, Jugador, sPoint, tPoint);
         //int OpponentScore = dGrafEnemic.getDistance(s, Jugador, sPoint, tPoint);
         //y luego aplicar la heuristica 2
+        */
+        return 0;
     }
     
     

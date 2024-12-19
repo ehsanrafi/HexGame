@@ -152,7 +152,15 @@ public class Monaco implements IPlayer, IAuto {
     */
     
     public int getHeuristica(HexGameStatus s) {
-        Dijkstra dGraf = new Dijkstra(s);
+        Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
+        Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
+        
+        //habría que ver esto
+        //se supone que sPoint es (-1, -1) y tPoint (-2, -2)
+        //hay que modificar getDistance para que sea solo así --> dGrafJuagor.shortestPath();
+        //int PlayerScore = dGrafJugador.getDistance(s, Jugador, sPoint, tPoint);
+        //int OpponentScore = dGrafEnemic.getDistance(s, Jugador, sPoint, tPoint);
+        //y luego aplicar la heuristica 2
         return 0;
     }
     

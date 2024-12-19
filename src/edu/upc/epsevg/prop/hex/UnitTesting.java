@@ -45,7 +45,7 @@ public class UnitTesting {
         }
 
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
-        Dijkstra d = new Dijkstra(gs);
+        Dijkstra d = new Dijkstra(gs, PlayerType.PLAYER1);
         int n = d.getDistance(gs, PlayerType.PLAYER1, new Point(8, 0), new Point(0, 8));
         System.out.println("Distància: " + n);
     }

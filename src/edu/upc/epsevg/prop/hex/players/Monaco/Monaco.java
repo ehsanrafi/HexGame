@@ -65,7 +65,7 @@ public class Monaco implements IPlayer, IAuto {
         JugadorEnemic = PlayerType.opposite(Jugador);
         
         for (int i = 0; i < s.getSize(); ++i) {
-            for (int j = 0; j < s.getSize(); ++j) {;
+            for (int j = 0; j < s.getSize(); ++j) {
                 if (s.getPos(new Point(i, j)) == 0) {
                     HexGameStatus AuxBoard = new HexGameStatus(s);
                     AuxBoard.placeStone(new Point(i, j));

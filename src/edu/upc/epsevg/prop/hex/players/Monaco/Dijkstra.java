@@ -29,6 +29,7 @@ public class Dijkstra extends HexGameStatus {
         return getDistance(new Point(START_NODE, START_NODE), new Point(END_NODE, END_NODE));
     }
     
+    
     public List<Point> getTopBorderNodes(HexGameStatus hgs) {
         List<Point> topBorder = new ArrayList<>();
         for (int x = 0; x < hgs.getSize(); x++) {
@@ -61,43 +62,6 @@ public class Dijkstra extends HexGameStatus {
         return rightBorder;
     }
     
-    /*
-    public List<Point> getTopBorderNodes(HexGameStatus hgs) {
-        List<Point> topBorder = new ArrayList<>();
-        for (int x = 0; x < hgs.getSize(); x++) {
-            if(hgs.getPos(0, x) == 0 || hgs.getPos(0, x) == PlayerType.getColor(p))
-                topBorder.add(new Point(x, 0));
-        }
-        return topBorder;
-    }
-    
-    public List<Point> getBottomBorderNodes(HexGameStatus hgs) {
-        List<Point> bottomBorder = new ArrayList<>();
-        for (int x = 0; x < hgs.getSize(); x++) {
-            if(hgs.getPos(hgs.getSize() - 1, x) == 0 || hgs.getPos(hgs.getSize() - 1, x) == PlayerType.getColor(p))
-                bottomBorder.add(new Point(x, hgs.getSize() - 1));
-        }
-        return bottomBorder;
-    }
-    
-    public List<Point> getLeftBorderNodes(HexGameStatus hgs) {
-        List<Point> leftBorder = new ArrayList<>();
-        for (int y = 0; y < hgs.getSize(); y++) {
-            if(hgs.getPos(y, 0) == 0 || hgs.getPos(y, 0) == PlayerType.getColor(p))
-                leftBorder.add(new Point(0, y));
-        }
-        return leftBorder;
-    }
-    
-    public List<Point> getRightBorderNodes(HexGameStatus hgs) {
-        List<Point> rightBorder = new ArrayList<>();
-        for (int y = 0; y < hgs.getSize(); y++) {
-            if(hgs.getPos(hgs.getSize() - 1, y) == 0 || hgs.getPos(hgs.getSize() - 1, y) == PlayerType.getColor(p)) 
-                rightBorder.add(new Point(hgs.getSize() - 1, y));
-        }
-        return rightBorder;
-    }
-    */
     public int getDistance(Point sPoint, Point tPoint) {
         int mida = hgs.getSize();
         int[][] dist = new int[mida][mida];
@@ -110,16 +74,6 @@ public class Dijkstra extends HexGameStatus {
             }
         }
         
-        /*
-        // Conectar START_NODE al borde inicial
-        List<Point> startBorder = (p == PlayerType.PLAYER1) ? getLeftBorderNodes(hgs) : getTopBorderNodes(hgs);
-        for (Point start : startBorder) {
-            dist[start.x][start.y] = 0;
-            queue.add(new Node(start.x, start.y, 0));
-        }
-        */
-        
-        //HE AÑADIDO ESTE IF
         List<Point> startBorder = (p == PlayerType.PLAYER1) ? getLeftBorderNodes(hgs) : getTopBorderNodes(hgs);
         for (Point start : startBorder) {
             if (hgs.getPos(start.x, start.y) == PlayerType.getColor(p) || hgs.getPos(start.x, start.y) == 0) {
@@ -152,13 +106,7 @@ public class Dijkstra extends HexGameStatus {
                 int ny = pCurrent.y + d[1];
                 
                 if (nx >= 0 && nx < mida && ny >= 0 && ny < mida && !visited[nx][ny]) {
-                    /*
-                    if (hgs.getPos(nx, ny) == -PlayerType.getColor(p)) {
-                        continue; // Saltar casillas bloqueadas por el oponente
-                    }
-                    */
                     int c = (hgs.getPos(nx, ny) == 0) ? 1 : 0; //coste
-                    //System.out.println("Evaluando posición: (" + nx + ", " + ny + ") - Valor: " + hgs.getPos(nx, ny));
                     if (hgs.getPos(nx, ny) == 0 || hgs.getPos(nx, ny) == PlayerType.getColor(p)) {
                         int newDist = dist[pCurrent.x][pCurrent.y] + c;
                         if (newDist < dist[nx][ny]) {

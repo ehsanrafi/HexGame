@@ -18,8 +18,7 @@ import java.util.Queue;
 import java.util.Random;
 
 /**
- * Jugador aleatori
- * @author bernat
+ * @author Ehsan i Iván
  */
 public class Monaco implements IPlayer, IAuto {
     private String name;
@@ -37,19 +36,18 @@ public class Monaco implements IPlayer, IAuto {
         this.profunditat = prof;
         this.timeout = false;
         this.jugadesExplorades = 0;
-        this.profMax = 0;
+        
+        if(m) {
+            this.profMax = 0;
+        } else {
+            this.profMax = prof;
+        }
     }
 
     @Override
     public void timeout() {
         timeout = true;
     }
-
-    //OPTIMITZACIÓ IDS
-    /*
-    Si ves que con i = 1, el mejor nodo es el tercero, con i = 2, empieza por el tercero.
-    Para saber si un nodo es una repeticción, usar hash table --> adaptar zobrist hashing
-    */
     
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que
@@ -61,17 +59,16 @@ public class Monaco implements IPlayer, IAuto {
     @Override
     public PlayerMove move(HexGameStatus s) {
         int valorMesAlt = Integer.MIN_VALUE;
+        int valor = Integer.MIN_VALUE;
         Point puntOptim = new Point();
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
         
         for (int i = 0; i < s.getSize(); ++i) {
-            for (int j = 0; j < s.getSize(); ++j) {
-                if (s.getPos(i, j) == 0) {
+            for (int j = 0; j < s.getSize(); ++j) {;
+                if (s.getPos(new Point(i, j)) == 0) {
                     HexGameStatus AuxBoard = new HexGameStatus(s);
                     AuxBoard.placeStone(new Point(i, j));
-
-                    int valor;
                     
                     /*
                     if(mode && !timeout) {
@@ -80,28 +77,26 @@ public class Monaco implements IPlayer, IAuto {
                         valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
                     }
                     */
-                    
+                  
                     valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
                     
                     if (valor > valorMesAlt) {
                         valorMesAlt = valor;
-                        puntOptim = new Point(i, j);
+                        puntOptim = new Point(i, j) ;
                     }
                 }
             }
-        }        
+        }
         
         //return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, SearchType.MINIMAX);
     }
 
+    
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
-        boolean fFinal = s.isGameOver();
-        if(fFinal || profunditat == 0) {
-            if(fFinal && s.GetWinner() == Jugador) {
-                return Integer.MAX_VALUE;
-            } else if(fFinal && s.GetWinner() == JugadorEnemic) {
-                return Integer.MIN_VALUE;
+        if(s.isGameOver() || profunditat == 0) {
+            if(s.isGameOver()) {
+                return (s.GetWinner()) == Jugador ? 1000 : -1000;
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
@@ -111,12 +106,14 @@ public class Monaco implements IPlayer, IAuto {
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         //if((mode && !timeout) || !mode) {
+            if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
+            
             for (int i = 0; i < s.getSize(); ++i) {
                 for (int j = 0; j < s.getSize(); ++j) {
                     if(s.getPos(i, j) == 0) {
                         HexGameStatus AuxBoard = new HexGameStatus(s);
                         AuxBoard.placeStone(new Point(i, j));
-                        
+
                         if(maxJugador) {
                             valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
                             alfa = Math.max(alfa, valor); 
@@ -124,7 +121,7 @@ public class Monaco implements IPlayer, IAuto {
                             valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
                             beta = Math.min(beta, valor);
                         }
-                        
+
                         if (alfa >= beta) break;
                     }
                 }
@@ -158,20 +155,12 @@ public class Monaco implements IPlayer, IAuto {
         int EnemicScore = dGrafEnemic.shortestPath();
         
         if(PlayerScore == Integer.MAX_VALUE) 
-            return Integer.MIN_VALUE;
-        if(EnemicScore == Integer.MAX_VALUE)
-            return Integer.MAX_VALUE;
-        //heuristica mala
-        return EnemicScore - PlayerScore;
+            return 1000;
+        if(EnemicScore == Integer.MIN_VALUE)
+            return -1000;
         
-        //habría que ver esto
-        //se supone que sPoint es (-1, -1) y tPoint (-2, -2)
-        //hay que modificar getDistance para que sea solo así --> dGrafJuagor.shortestPath();
-        //int PlayerScore = dGrafJugador.getDistance(s, Jugador, sPoint, tPoint);
-        //int OpponentScore = dGrafEnemic.getDistance(s, Jugador, sPoint, tPoint);
-        //y luego aplicar la heuristica 2
+        return EnemicScore - PlayerScore;
     }
-    
     
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps

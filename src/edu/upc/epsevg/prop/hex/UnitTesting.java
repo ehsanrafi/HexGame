@@ -38,9 +38,9 @@ public class UnitTesting {
         };
         */
         byte[][] board = {
-            { 1, -1, 0 },
-              { 1, 1, 0 },
-                { 1, 0, 1 }
+            { 1, -1, -1 },
+              { 1, 1, -1 },
+                { 1, 0, -1 }
         };
         
         //System.out.println("ocupa: " + board[0][1]);

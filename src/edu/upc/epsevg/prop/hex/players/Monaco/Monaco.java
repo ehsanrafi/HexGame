@@ -58,8 +58,8 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
-        int valorMesAlt = Integer.MIN_VALUE;
-        int valor = Integer.MIN_VALUE;
+        double valorMesAlt = Integer.MIN_VALUE;
+        double valor = Integer.MIN_VALUE;
         Point puntOptim = new Point();
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
@@ -92,17 +92,17 @@ public class Monaco implements IPlayer, IAuto {
     }
 
     
-    public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
+    public double minimaxAlfaBeta(HexGameStatus s, double alfa, double beta, int profunditat, boolean maxJugador) {
         if(s.isGameOver() || profunditat == 0) {
             if(s.isGameOver()) {
-                return (s.GetWinner()) == Jugador ? 1000 : -1000;
+                return (s.GetWinner()) == Jugador ? 1000000 : -1000000;
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
             }
         }
         
-        int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        double valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         if((mode && !timeout) || !mode) {
             if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
@@ -130,10 +130,10 @@ public class Monaco implements IPlayer, IAuto {
         return valor;
     }
     
-    public int minimaxIDS(HexGameStatus s) {
+    public double minimaxIDS(HexGameStatus s) {
         //falta guardar primer movimiento del bucle anterior
-        int millorValor = Integer.MIN_VALUE;
-        int millorValorAux = Integer.MIN_VALUE;
+        double millorValor = Integer.MIN_VALUE;
+        double millorValorAux = Integer.MIN_VALUE;
         
         for(int pActual = 1; !timeout; ++pActual) {
             millorValor = millorValorAux;
@@ -143,6 +143,28 @@ public class Monaco implements IPlayer, IAuto {
         return millorValor;
     }
     
+    public double getHeuristica(HexGameStatus s) {
+        Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
+        Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
+        int PlayerScore = dGrafJugador.shortestPath();
+        int EnemicScore = dGrafEnemic.shortestPath();
+        
+        if(PlayerScore == Integer.MAX_VALUE) {
+            return -1000000;
+        } 
+        
+        if(EnemicScore == Integer.MAX_VALUE) {
+            return 1000000;
+        } 
+        
+        double PlayerEvaluation = Math.pow(2, -PlayerScore);
+        double EnemicEvaluation = Math.pow(2, -EnemicScore);
+        
+        return PlayerEvaluation - EnemicEvaluation;
+        
+        //return (EnemicScore - PlayerScore);
+    }  
+   /* 
     public int getHeuristica(HexGameStatus s) {
         Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
         Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
@@ -150,15 +172,16 @@ public class Monaco implements IPlayer, IAuto {
         int EnemicScore = dGrafEnemic.shortestPath();
         
         if(PlayerScore == Integer.MAX_VALUE) {
-            return 1000;
+            return -1000;
         } 
         
-        if(EnemicScore == Integer.MIN_VALUE) {
-            return -1000;
+        if(EnemicScore == Integer.MAX_VALUE) {
+            return 1000;
         } 
         
         return (EnemicScore - PlayerScore);
     }
+    */
     
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps

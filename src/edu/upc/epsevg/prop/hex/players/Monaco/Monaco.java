@@ -21,9 +21,9 @@ import java.util.Random;
  * @author Ehsan i Iván
  */
 public class Monaco implements IPlayer, IAuto {
-    private String name;
-    private boolean mode;
-    private int profunditat;
+    private final String name;
+    private final boolean mode;
+    private final int profunditat;
     private boolean timeout;
     private PlayerType Jugador;
     private PlayerType JugadorEnemic;
@@ -70,15 +70,14 @@ public class Monaco implements IPlayer, IAuto {
                     HexGameStatus AuxBoard = new HexGameStatus(s);
                     AuxBoard.placeStone(new Point(i, j));
                     
-                    /*
+                    
                     if(mode && !timeout) {
                         valor = minimaxIDS(s);
                     } else {
                         valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
                     }
-                    */
-                  
-                    valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+                    
+                    //valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
                     
                     if (valor > valorMesAlt) {
                         valorMesAlt = valor;
@@ -88,8 +87,8 @@ public class Monaco implements IPlayer, IAuto {
             }
         }
         
-        //return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
-        return new PlayerMove(puntOptim, jugadesExplorades, profMax, SearchType.MINIMAX);
+        return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+        //return new PlayerMove(puntOptim, jugadesExplorades, profMax, SearchType.MINIMAX);
     }
 
     
@@ -105,7 +104,7 @@ public class Monaco implements IPlayer, IAuto {
         
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        //if((mode && !timeout) || !mode) {
+        if((mode && !timeout) || !mode) {
             if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
             
             for (int i = 0; i < s.getSize(); ++i) {
@@ -126,27 +125,23 @@ public class Monaco implements IPlayer, IAuto {
                     }
                 }
             }
-        //}
+        }
         
         return valor;
     }
     
-    /*
     public int minimaxIDS(HexGameStatus s) {
         //falta guardar primer movimiento del bucle anterior
         int millorValor = Integer.MIN_VALUE;
         int millorValorAux = Integer.MIN_VALUE;
         
         for(int pActual = 1; !timeout; ++pActual) {
-            ++profMax;
             millorValor = millorValorAux;
             millorValorAux = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, true);
         }
         
-        --profMax;
         return millorValor;
     }
-    */
     
     public int getHeuristica(HexGameStatus s) {
         Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
@@ -154,12 +149,15 @@ public class Monaco implements IPlayer, IAuto {
         int PlayerScore = dGrafJugador.shortestPath();
         int EnemicScore = dGrafEnemic.shortestPath();
         
-        if(PlayerScore == Integer.MAX_VALUE) 
+        if(PlayerScore == Integer.MAX_VALUE) {
             return 1000;
-        if(EnemicScore == Integer.MIN_VALUE)
-            return -1000;
+        } 
         
-        return EnemicScore - PlayerScore;
+        if(EnemicScore == Integer.MIN_VALUE) {
+            return -1000;
+        } 
+        
+        return (EnemicScore - PlayerScore);
     }
     
     /**

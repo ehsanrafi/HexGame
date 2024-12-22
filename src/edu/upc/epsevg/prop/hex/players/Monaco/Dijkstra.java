@@ -29,7 +29,6 @@ public class Dijkstra extends HexGameStatus {
         return getDistance(new Point(START_NODE, START_NODE), new Point(END_NODE, END_NODE));
     }
     
-    
     public List<Point> getTopBorderNodes(HexGameStatus hgs) {
         List<Point> topBorder = new ArrayList<>();
         for (int x = 0; x < hgs.getSize(); x++) {

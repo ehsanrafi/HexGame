@@ -58,8 +58,8 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
-        double valorMesAlt = Integer.MIN_VALUE;
-        double valor = Integer.MIN_VALUE;
+        double valorMesAlt = Double.MIN_VALUE;
+        double valor = Double.MIN_VALUE;
         Point puntOptim = new Point();
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
@@ -74,7 +74,7 @@ public class Monaco implements IPlayer, IAuto {
                     if(mode && !timeout) {
                         valor = minimaxIDS(s);
                     } else {
-                        valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+                        valor = minimaxAlfaBeta(AuxBoard, Double.MIN_VALUE, Double.MAX_VALUE, profunditat - 1, false);
                     }
                     
                     //valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
@@ -95,14 +95,14 @@ public class Monaco implements IPlayer, IAuto {
     public double minimaxAlfaBeta(HexGameStatus s, double alfa, double beta, int profunditat, boolean maxJugador) {
         if(s.isGameOver() || profunditat == 0) {
             if(s.isGameOver()) {
-                return (s.GetWinner()) == Jugador ? 1000000 : -1000000;
+                return (s.GetWinner()) == Jugador ? 1000 : -1000;
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
             }
         }
         
-        double valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        double valor = maxJugador ? Double.MIN_VALUE : Double.MAX_VALUE;
 
         if((mode && !timeout) || !mode) {
             if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
@@ -137,7 +137,7 @@ public class Monaco implements IPlayer, IAuto {
         
         for(int pActual = 1; !timeout; ++pActual) {
             millorValor = millorValorAux;
-            millorValorAux = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, true);
+            millorValorAux = minimaxAlfaBeta(s, Double.MIN_VALUE, Double.MAX_VALUE, pActual, true);
         }
         
         return millorValor;
@@ -150,12 +150,13 @@ public class Monaco implements IPlayer, IAuto {
         int EnemicScore = dGrafEnemic.shortestPath();
         
         if(PlayerScore == Integer.MAX_VALUE) {
-            return -1000000;
+            return -950;
         } 
         
         if(EnemicScore == Integer.MAX_VALUE) {
-            return 1000000;
+            return 950;
         } 
+        
         
         double PlayerEvaluation = Math.pow(2, -PlayerScore);
         double EnemicEvaluation = Math.pow(2, -EnemicScore);

@@ -26,14 +26,14 @@ public class Game {
             @Override
             public void run() {
                 
-                //IPlayer player1 = new H_E_X_Player(2/*GB*/);
+                IPlayer player1 = new H_E_X_Player(2/*GB*/);
                 //IPlayer player1 = new RandomPlayer("Random");
-                IPlayer player1 = new Monaco("Monaco2023", false, 8);
+                //IPlayer player1 = new Monaco("Monaco2023", false, 2);
                 
-                //IPlayer player2 = new Monaco("Monaco2023", true, 8);
-                IPlayer player2 = new H_E_X_Player(2/*GB*/);
+                IPlayer player2 = new Monaco("Monaco2023", false, 2);
+                //IPlayer player2 = new H_E_X_Player(2/*GB*/);
                                 
-                new Board(player1 , player2, 4 /*mida*/,  5/*s*/, true);
+                new Board(player1 , player2, 5 /*mida*/,  30/*s*/, false);
              }
         });
     }

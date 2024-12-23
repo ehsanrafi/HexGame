@@ -58,8 +58,8 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
-        double valorMesAlt = Double.MIN_VALUE;
-        double valor = Double.MIN_VALUE;
+        int valorMesAlt = Integer.MIN_VALUE;
+        int valor = Integer.MIN_VALUE;
         Point puntOptim = new Point();
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
@@ -74,7 +74,7 @@ public class Monaco implements IPlayer, IAuto {
                     if(mode && !timeout) {
                         valor = minimaxIDS(s);
                     } else {
-                        valor = minimaxAlfaBeta(AuxBoard, Double.MIN_VALUE, Double.MAX_VALUE, profunditat - 1, false);
+                        valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
                     }
                     
                     //valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
@@ -87,12 +87,12 @@ public class Monaco implements IPlayer, IAuto {
             }
         }
         
+        System.out.println("Heuristic: " + valor);
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
         //return new PlayerMove(puntOptim, jugadesExplorades, profMax, SearchType.MINIMAX);
     }
 
-    
-    public double minimaxAlfaBeta(HexGameStatus s, double alfa, double beta, int profunditat, boolean maxJugador) {
+    public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
         if(s.isGameOver() || profunditat == 0) {
             if(s.isGameOver()) {
                 return (s.GetWinner()) == Jugador ? 1000 : -1000;
@@ -102,7 +102,7 @@ public class Monaco implements IPlayer, IAuto {
             }
         }
         
-        double valor = maxJugador ? Double.MIN_VALUE : Double.MAX_VALUE;
+        int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         if((mode && !timeout) || !mode) {
             if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
@@ -130,24 +130,32 @@ public class Monaco implements IPlayer, IAuto {
         return valor;
     }
     
-    public double minimaxIDS(HexGameStatus s) {
+    public int minimaxIDS(HexGameStatus s) {
         //falta guardar primer movimiento del bucle anterior
-        double millorValor = Integer.MIN_VALUE;
-        double millorValorAux = Integer.MIN_VALUE;
+        int millorValor = Integer.MIN_VALUE;
+        int millorValorAux = Integer.MIN_VALUE;
         
         for(int pActual = 1; !timeout; ++pActual) {
             millorValor = millorValorAux;
-            millorValorAux = minimaxAlfaBeta(s, Double.MIN_VALUE, Double.MAX_VALUE, pActual, true);
+            millorValorAux = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, true);
         }
         
         return millorValor;
     }
     
-    public double getHeuristica(HexGameStatus s) {
+    public int getHeuristica(HexGameStatus s) {
         Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
         Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
         int PlayerScore = dGrafJugador.shortestPath();
         int EnemicScore = dGrafEnemic.shortestPath();
+        
+        if (PlayerScore == 0) {
+            return 1000;
+        }
+        
+        if (EnemicScore == 0) {
+            return -1000;
+        }
         
         if(PlayerScore == Integer.MAX_VALUE) {
             return -950;
@@ -157,11 +165,15 @@ public class Monaco implements IPlayer, IAuto {
             return 950;
         } 
         
-        
-        double PlayerEvaluation = Math.pow(2, -PlayerScore);
-        double EnemicEvaluation = Math.pow(2, -EnemicScore);
+        int PlayerEvaluation = Math.max(1, 100 - Math.abs(PlayerScore));
+        int EnemicEvaluation = Math.max(1, 100 - Math.abs(EnemicScore));
         
         return PlayerEvaluation - EnemicEvaluation;
+        
+        //double PlayerEvaluation = Math.pow(2, -PlayerScore);
+        //double EnemicEvaluation = Math.pow(2, -EnemicScore);
+        
+        //return PlayerEvaluation - EnemicEvaluation;
         
         //return (EnemicScore - PlayerScore);
     }  

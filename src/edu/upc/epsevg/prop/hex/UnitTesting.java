@@ -40,7 +40,7 @@ public class UnitTesting {
         
         byte[][] board = {
             { 0, 0, 0 , -1},
-              { 0, 0, 1, 1},
+              { 1, 0, 1, 1},
                 { 0, 1, 0, -1},
                   { 0, 1, 0, -1}
         };
@@ -64,6 +64,27 @@ public class UnitTesting {
         //PLAYER2 - LADOS HORIZONTALES - (ARRIBA Y ABAJO)
         Dijkstra dEnemic = new Dijkstra(gsAux, PlayerType.PLAYER2);
         int nEnemic = dEnemic.shortestPath();
+        
+        if (nJugador == 0) {
+            System.out.println("Heuristic: 1000");
+        }
+        
+        if (nEnemic == 0) {
+            System.out.println("Heuristic: -1000");
+        }
+        
+        if(nJugador == Integer.MAX_VALUE) {
+            System.out.println("Heuristic: -950");
+        } 
+        
+        if(nEnemic == Integer.MAX_VALUE) {
+            System.out.println("Heuristic: 950");
+        } 
+        
+        int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
+        int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
+        
+        System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
         System.out.println("Distance Jugador: " + nJugador);
         System.err.println("Distance Enemic: " + nEnemic);
     }

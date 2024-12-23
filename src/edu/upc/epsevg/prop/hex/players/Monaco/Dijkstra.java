@@ -75,9 +75,12 @@ public class Dijkstra extends HexGameStatus {
         
         List<Point> startBorder = (p == PlayerType.PLAYER1) ? getLeftBorderNodes(hgs) : getTopBorderNodes(hgs);
         for (Point start : startBorder) {
-            if (hgs.getPos(start.x, start.y) == PlayerType.getColor(p) || hgs.getPos(start.x, start.y) == 0) {
+            if (hgs.getPos(start.x, start.y) == PlayerType.getColor(p)) {
                 dist[start.x][start.y] = 0;
                 queue.add(new Node(start.x, start.y, 0));
+            } else if (hgs.getPos(start.x, start.y) == 0) {
+                dist[start.x][start.y] = 1;
+                queue.add(new Node(start.x, start.y, 1));
             }
         }
         
@@ -105,7 +108,8 @@ public class Dijkstra extends HexGameStatus {
                 int ny = pCurrent.y + d[1];
                 
                 if (nx >= 0 && nx < mida && ny >= 0 && ny < mida && !visited[nx][ny]) {
-                    int c = (hgs.getPos(nx, ny) == 0) ? 1 : 0; //coste
+                    //int c = (hgs.getPos(nx, ny) == 0) ? 1 : 0; //coste
+                    int c = (hgs.getPos(nx, ny) == PlayerType.getColor(p)) ? 0 : 1;
                     if (hgs.getPos(nx, ny) == 0 || hgs.getPos(nx, ny) == PlayerType.getColor(p)) {
                         int newDist = dist[pCurrent.x][pCurrent.y] + c;
                         if (newDist < dist[nx][ny]) {

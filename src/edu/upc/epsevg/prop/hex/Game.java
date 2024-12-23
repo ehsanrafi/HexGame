@@ -30,10 +30,10 @@ public class Game {
                 //IPlayer player1 = new RandomPlayer("Random");
                 //IPlayer player1 = new Monaco("Monaco2023", false, 2);
                 
-                IPlayer player2 = new Monaco("Monaco2023", false, 2);
+                IPlayer player2 = new Monaco("Monaco2023", true, 1);
                 //IPlayer player2 = new H_E_X_Player(2/*GB*/);
                                 
-                new Board(player1 , player2, 5 /*mida*/,  30/*s*/, false);
+                new Board(player1 , player2, 3 /*mida*/,  10/*s*/, false);
              }
         });
     }

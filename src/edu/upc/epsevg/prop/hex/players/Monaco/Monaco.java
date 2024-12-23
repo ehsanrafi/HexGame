@@ -46,7 +46,8 @@ public class Monaco implements IPlayer, IAuto {
 
     @Override
     public void timeout() {
-        timeout = true;
+        this.timeout = true;
+        
     }
     
     /**
@@ -60,43 +61,80 @@ public class Monaco implements IPlayer, IAuto {
     public PlayerMove move(HexGameStatus s) {
         int valorMesAlt = Integer.MIN_VALUE;
         int valor = Integer.MIN_VALUE;
-        Point puntOptim = new Point();
+        Point puntOptim = null;
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
         
-        for (int i = 0; i < s.getSize(); ++i) {
-            for (int j = 0; j < s.getSize(); ++j) {
-                if (s.getPos(new Point(i, j)) == 0) {
-                    HexGameStatus AuxBoard = new HexGameStatus(s);
-                    AuxBoard.placeStone(new Point(i, j));
-                    
-                    
-                    if(mode && !timeout) {
-                        valor = minimaxIDS(s);
-                    } else {
-                        valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+        if (mode) {
+            for (int pActual = 1; !s.isGameOver() && !timeout; ++pActual) {
+                Point puntActual = null;
+                valorMesAlt = Integer.MIN_VALUE;
+                valor = Integer.MIN_VALUE;
+                
+                for (int i = 0; i < s.getSize() && !timeout; ++i) {
+                    for (int j = 0; j < s.getSize() && !timeout; ++j) {
+                        if (s.getPos(new Point(i, j)) == 0 && !timeout) {
+                            HexGameStatus AuxBoard = new HexGameStatus(s);
+                            AuxBoard.placeStone(new Point(i, j));
+                            
+                            valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual - 1, false);
+                            
+                            if (valor > valorMesAlt && !timeout) {
+                                valorMesAlt = valor;
+                                puntActual = new Point(i, j);
+                            }
+                        }
                     }
-                    
-                    //valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
-                    
-                    if (valor > valorMesAlt) {
-                        valorMesAlt = valor;
-                        puntOptim = new Point(i, j) ;
+                }
+                
+                if (!timeout) {
+                    puntOptim = puntActual;
+                    profMax = pActual;
+                }
+            }
+        } else {
+            for (int i = 0; i < s.getSize(); ++i) {
+                for (int j = 0; j < s.getSize(); ++j) {
+                    if (s.getPos(new Point(i, j)) == 0) {
+                        HexGameStatus AuxBoard = new HexGameStatus(s);
+                        AuxBoard.placeStone(new Point(i, j));
+                        
+                        valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+
+                        if (valor > valorMesAlt) {
+                            valorMesAlt = valor;
+                            puntOptim = new Point(i, j);
+                        }
                     }
                 }
             }
         }
         
-        System.out.println("Heuristic: " + valor);
+        /*
+        // Garantim que es retorna un moviment vàlid
+        if (puntOptim == null) {
+            for (int i = 0; i < s.getSize(); ++i) {
+                for (int j = 0; j < s.getSize(); ++j) {
+                    if (s.getPos(new Point(i, j)) == 0) {
+                        puntOptim = new Point(i, j);
+                        break;
+                    }
+                }
+                if (puntOptim != null) break;
+            }
+        }
+        */
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
-        //return new PlayerMove(puntOptim, jugadesExplorades, profMax, SearchType.MINIMAX);
     }
 
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
-        if(s.isGameOver() || profunditat == 0) {
+        if(timeout || s.isGameOver() || profunditat == 0) {
             if(s.isGameOver()) {
                 return (s.GetWinner()) == Jugador ? 1000 : -1000;
-            } else {
+            } else if(timeout) {
+                return 0;
+            }
+            else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
             }
@@ -104,8 +142,8 @@ public class Monaco implements IPlayer, IAuto {
         
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        if((mode && !timeout) || !mode) {
-            if(mode) profMax = Math.max(profMax, this.profunditat - profunditat);
+        //if((mode && !timeout) || !mode) {
+            if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
             
             for (int i = 0; i < s.getSize(); ++i) {
                 for (int j = 0; j < s.getSize(); ++j) {
@@ -125,22 +163,9 @@ public class Monaco implements IPlayer, IAuto {
                     }
                 }
             }
-        }
+        //}
         
         return valor;
-    }
-    
-    public int minimaxIDS(HexGameStatus s) {
-        //falta guardar primer movimiento del bucle anterior
-        int millorValor = Integer.MIN_VALUE;
-        int millorValorAux = Integer.MIN_VALUE;
-        
-        for(int pActual = 1; !timeout; ++pActual) {
-            millorValor = millorValorAux;
-            millorValorAux = minimaxAlfaBeta(s, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual, true);
-        }
-        
-        return millorValor;
     }
     
     public int getHeuristica(HexGameStatus s) {

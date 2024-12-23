@@ -28,10 +28,10 @@ public class HeadlessGame {
     
     public static void main(String[] args) {
 
-        IPlayer player1 = new Monaco("Monaco2023", false, 8);
+        IPlayer player1 = new Monaco("Monaco2023", true, 8);
         IPlayer player2 = new H_E_X_Player(2/*GB*/);                    
         //IPlayer player2 = new RandomPlayer("Rando");
-        HeadlessGame game = new HeadlessGame(player1, player2, 5, 5/*s timeout*/, 1/*games*/);
+        HeadlessGame game = new HeadlessGame(player1, player2, 5, 10/*s timeout*/, 3/*games*/);
         GameResult gr = game.start();
         System.out.println(gr);
 

@@ -5,8 +5,10 @@ import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  *
@@ -29,6 +31,7 @@ public class Dijkstra extends HexGameStatus {
         return getDistance(new Point(START_NODE, START_NODE), new Point(END_NODE, END_NODE));
     }
     
+    /*
     public List<Point> getTopBorderNodes(HexGameStatus hgs) {
         List<Point> topBorder = new ArrayList<>();
         for (int x = 0; x < hgs.getSize(); x++) {
@@ -60,7 +63,40 @@ public class Dijkstra extends HexGameStatus {
         }
         return rightBorder;
     }
+    */
     
+    public Set<Point> getTopBorderNodes(HexGameStatus hgs) {
+        Set<Point> topBorder = new HashSet<>();
+        for (int x = 0; x < hgs.getSize(); x++) {
+            topBorder.add(new Point(x, 0));
+        }
+        return topBorder;
+    }
+
+    public Set<Point> getBottomBorderNodes(HexGameStatus hgs) {
+        Set<Point> bottomBorder = new HashSet<>();
+        for (int x = 0; x < hgs.getSize(); x++) {
+            bottomBorder.add(new Point(x, hgs.getSize() - 1));
+        }
+        return bottomBorder;
+    }
+
+    public Set<Point> getLeftBorderNodes(HexGameStatus hgs) {
+        Set<Point> leftBorder = new HashSet<>();
+        for (int y = 0; y < hgs.getSize(); y++) {
+            leftBorder.add(new Point(0, y));
+        }
+        return leftBorder;
+    }
+
+    public Set<Point> getRightBorderNodes(HexGameStatus hgs) {
+        Set<Point> rightBorder = new HashSet<>();
+        for (int y = 0; y < hgs.getSize(); y++) {
+            rightBorder.add(new Point(hgs.getSize() - 1, y));
+        }
+        return rightBorder;
+    }
+
     public int getDistance(Point sPoint, Point tPoint) {
         int mida = hgs.getSize();
         int[][] dist = new int[mida][mida];
@@ -73,6 +109,7 @@ public class Dijkstra extends HexGameStatus {
             }
         }
         
+        /*
         List<Point> startBorder = (p == PlayerType.PLAYER1) ? getLeftBorderNodes(hgs) : getTopBorderNodes(hgs);
         for (Point start : startBorder) {
             if (hgs.getPos(start.x, start.y) == PlayerType.getColor(p)) {
@@ -86,6 +123,20 @@ public class Dijkstra extends HexGameStatus {
         
         // Definir los nodos del borde final
         List<Point> endBorder = (p == PlayerType.PLAYER1) ? getRightBorderNodes(hgs) : getBottomBorderNodes(hgs);
+        */
+        
+        Set<Point> startBorder = (p == PlayerType.PLAYER1) ? getLeftBorderNodes(hgs) : getTopBorderNodes(hgs);
+        for (Point start : startBorder) {
+            if (hgs.getPos(start.x, start.y) == PlayerType.getColor(p)) {
+                dist[start.x][start.y] = 0;
+                queue.add(new Node(start.x, start.y, 0));
+            } else if (hgs.getPos(start.x, start.y) == 0) {
+                dist[start.x][start.y] = 1;
+                queue.add(new Node(start.x, start.y, 1));
+            }
+        }
+        
+        Set<Point> endBorder = (p == PlayerType.PLAYER1) ? getRightBorderNodes(hgs) : getBottomBorderNodes(hgs);
         
         int[][] dir = {
             {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}

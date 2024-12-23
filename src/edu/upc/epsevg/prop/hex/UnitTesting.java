@@ -22,7 +22,7 @@ import java.util.Queue;
  */
 public class UnitTesting {
     public static void main(String[] args) {
-        
+        /*
         byte[][] board = {
         //X   0  1  2  3  4  5  6  7  8
             { 1, 1, 1, 1, 1, 1, 1, 1, 0},                     // 0   Y
@@ -35,16 +35,16 @@ public class UnitTesting {
                           { 1, 0, 0, 0, 0, 0, 0, 0, -1},        // 7
                             { 0, 0, 0, 0, 0, 0, 0, 0, -1}       // 8    Y
         };
+        */
         
         
-        /*
         byte[][] board = {
             { 0, 0, 0 , -1},
               { 0, 0, 1, 1},
-                { 1, 1, 0, -1},
+                { 0, 1, 0, -1},
                   { 0, 1, 0, -1}
         };
-        */
+        
         //System.out.println("ocupa: " + board[0][1]);
         /*
         for (int i = 0; i < board.length; ++i) {
@@ -57,11 +57,12 @@ public class UnitTesting {
         
         //PLAYER1 = 1 : PLAYER2 : -1
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
+        HexGameStatus gsAux = new HexGameStatus(board, PlayerType.PLAYER2);
         //PLAYER1 - LADOS VERTICALES (IZQUIERDA Y DERECHA)
         Dijkstra dJugador = new Dijkstra(gs, PlayerType.PLAYER1);
         int nJugador = dJugador.shortestPath();
         //PLAYER2 - LADOS HORIZONTALES - (ARRIBA Y ABAJO)
-        Dijkstra dEnemic = new Dijkstra(gs, PlayerType.PLAYER2);
+        Dijkstra dEnemic = new Dijkstra(gsAux, PlayerType.PLAYER2);
         int nEnemic = dEnemic.shortestPath();
         System.out.println("Distance Jugador: " + nJugador);
         System.err.println("Distance Enemic: " + nEnemic);

@@ -34,7 +34,7 @@ public class Monaco implements IPlayer, IAuto {
         this.name = name;
         this.mode = m;
         this.profunditat = prof;
-        this.timeout = false;
+        //this.timeout = false;
         this.jugadesExplorades = 0;
         
         if(m) {
@@ -59,6 +59,7 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
+        timeout = false;
         int valorMesAlt = Integer.MIN_VALUE;
         int valor = Integer.MIN_VALUE;
         Point puntOptim = null;

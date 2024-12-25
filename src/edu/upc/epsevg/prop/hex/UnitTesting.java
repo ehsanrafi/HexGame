@@ -39,14 +39,17 @@ public class UnitTesting {
         
         
         byte[][] board = {
-            { 0, 0, 0 , -1},
-              { 1, 0, 1, 1},
-                { 0, 1, 0, -1},
-                  { 0, 1, 0, -1}
+            { 1, 0, 0 , -1},
+              { 1, 0, -1, 0},
+                { 1, 1, -1, 0},
+                  { 0, 0, 0, 0}
         };
+        
+        
         
         //System.out.println("ocupa: " + board[0][1]);
         /*
+        System.out.println("Original:");
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
                 System.out.print(board[i][j] + " ");
@@ -57,29 +60,32 @@ public class UnitTesting {
         
         //PLAYER1 = 1 : PLAYER2 : -1
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
-        HexGameStatus gsAux = new HexGameStatus(board, PlayerType.PLAYER2);
         //PLAYER1 - LADOS VERTICALES (IZQUIERDA Y DERECHA)
-        Dijkstra dJugador = new Dijkstra(gs, PlayerType.PLAYER1);
-        int nJugador = dJugador.shortestPath();
+        //Dijkstra dGraf = new Dijkstra(gs);
+        System.out.println(gs.getMoves());
+        
+        /*
+        byte[][] boardAux = new byte[gs.getSize()][gs.getSize()];
+        
+        for (int i = 0; i < gs.getSize(); ++i) {
+            for (int j = 0; j < gs.getSize(); ++j) {
+                boardAux[j][i] = (byte) gs.getPos(i, j);
+            }
+        }
+        
+        System.out.println("Copy:");
+        for (int i = 0; i < boardAux.length; ++i) {
+            for (int j = 0; j < boardAux[i].length; ++j) {
+                System.out.print(boardAux[i][j] + " ");
+            }
+            System.out.println();
+        }
+        */
+        /*
+        int nJugador = dGraf.getDistance(PlayerType.PLAYER1);
         //PLAYER2 - LADOS HORIZONTALES - (ARRIBA Y ABAJO)
-        Dijkstra dEnemic = new Dijkstra(gsAux, PlayerType.PLAYER2);
-        int nEnemic = dEnemic.shortestPath();
+        int nEnemic = dGraf.getDistance(PlayerType.PLAYER2);
         
-        if (nJugador == 0) {
-            System.out.println("Heuristic: 1000");
-        }
-        
-        if (nEnemic == 0) {
-            System.out.println("Heuristic: -1000");
-        }
-        
-        if(nJugador == Integer.MAX_VALUE) {
-            System.out.println("Heuristic: -950");
-        } 
-        
-        if(nEnemic == Integer.MAX_VALUE) {
-            System.out.println("Heuristic: 950");
-        } 
         
         int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
         int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
@@ -87,5 +93,9 @@ public class UnitTesting {
         System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
         System.out.println("Distance Jugador: " + nJugador);
         System.err.println("Distance Enemic: " + nEnemic);
+        if(gs.isGameOver() && gs.GetWinner() == PlayerType.PLAYER1) {
+            System.out.println("Guanyador PLAYER1");
+        }
+        */
     }
 }

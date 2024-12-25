@@ -34,16 +34,20 @@ public class Monaco implements IPlayer, IAuto {
         this.name = name;
         this.mode = m;
         this.profunditat = prof;
-        //this.timeout = false;
         this.jugadesExplorades = 0;
         
         if(m) {
             this.profMax = 0;
-        } else {
+        }/* else {
             this.profMax = prof;
         }
+        */
     }
-
+    
+    /**
+     * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
+     * de joc.
+     */
     @Override
     public void timeout() {
         this.timeout = true;
@@ -59,7 +63,11 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
+        if(mode) {
+            profMax = 0;
+        }
         timeout = false;
+        jugadesExplorades = 0;
         int valorMesAlt = Integer.MIN_VALUE;
         int valor = Integer.MIN_VALUE;
         Point puntOptim = null;
@@ -129,87 +137,55 @@ public class Monaco implements IPlayer, IAuto {
     }
 
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
-        if(timeout || s.isGameOver() || profunditat == 0) {
-            if(s.isGameOver()) {
-                return (s.GetWinner()) == Jugador ? 1000 : -1000;
-            } else if(timeout) {
-                return 0;
-            }
-            else {
+        if (timeout && mode) {
+            return 0;
+        }
+        
+        if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
+
+        if(s.isGameOver() || profunditat == 0) {
+            if (s.isGameOver()) {
+                return (s.GetWinner() == Jugador) ? 10000 : -10000;
+            } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);
             }
         }
         
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        
+        for (int i = 0; i < s.getSize(); ++i) {
+            for (int j = 0; j < s.getSize(); ++j) {
+                if(s.getPos(i, j) == 0) {
+                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    AuxBoard.placeStone(new Point(i, j));
 
-        //if((mode && !timeout) || !mode) {
-            if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
-            
-            for (int i = 0; i < s.getSize(); ++i) {
-                for (int j = 0; j < s.getSize(); ++j) {
-                    if(s.getPos(i, j) == 0) {
-                        HexGameStatus AuxBoard = new HexGameStatus(s);
-                        AuxBoard.placeStone(new Point(i, j));
-
-                        if(maxJugador) {
-                            valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
-                            alfa = Math.max(alfa, valor); 
-                        } else {
-                            valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
-                            beta = Math.min(beta, valor);
-                        }
-
-                        if (alfa >= beta) break;
+                    if(maxJugador) {
+                        valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
+                        alfa = Math.max(alfa, valor); 
+                    } else {
+                        valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
+                        beta = Math.min(beta, valor);
                     }
+
+                    if (alfa >= beta) break;
                 }
             }
-        //}
+        }
         
         return valor;
     }
     
     public int getHeuristica(HexGameStatus s) {
-        Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
-        Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
-        int PlayerScore = dGrafJugador.shortestPath();
-        int EnemicScore = dGrafEnemic.shortestPath();
+        Dijkstra dGrafJugador = new Dijkstra(s);
+        Dijkstra dGrafEnemic = new Dijkstra(s);
         
-        if (PlayerScore == 0) {
-            return 1000;
-        }
+        int PlayerScore = dGrafJugador.getDistance(Jugador);
+        int EnemicScore = dGrafEnemic.getDistance(JugadorEnemic);
         
-        if (EnemicScore == 0) {
-            return -1000;
-        }
         
-        if(PlayerScore == Integer.MAX_VALUE) {
-            return -950;
-        } 
-        
-        if(EnemicScore == Integer.MAX_VALUE) {
-            return 950;
-        } 
-        
-        int PlayerEvaluation = Math.max(1, 100 - Math.abs(PlayerScore));
-        int EnemicEvaluation = Math.max(1, 100 - Math.abs(EnemicScore));
-        
-        return PlayerEvaluation - EnemicEvaluation;
-        
-        //double PlayerEvaluation = Math.pow(2, -PlayerScore);
-        //double EnemicEvaluation = Math.pow(2, -EnemicScore);
-        
-        //return PlayerEvaluation - EnemicEvaluation;
-        
-        //return (EnemicScore - PlayerScore);
-    }  
-   /* 
-    public int getHeuristica(HexGameStatus s) {
-        Dijkstra dGrafJugador = new Dijkstra(s, Jugador);
-        Dijkstra dGrafEnemic = new Dijkstra(s, JugadorEnemic);
-        int PlayerScore = dGrafJugador.shortestPath();
-        int EnemicScore = dGrafEnemic.shortestPath();
-        
+        /*
+        // Nunca llegamos aquí, no?
         if(PlayerScore == Integer.MAX_VALUE) {
             return -1000;
         } 
@@ -217,18 +193,119 @@ public class Monaco implements IPlayer, IAuto {
         if(EnemicScore == Integer.MAX_VALUE) {
             return 1000;
         } 
+        */
         
-        return (EnemicScore - PlayerScore);
+        int PlayerEvaluation = Math.max(1, 100 - PlayerScore /* + BonusCamino?? */);
+        int EnemicEvaluation = Math.max(1, 100 - EnemicScore);
+        
+        int twoBridgeAdvantage = calculateTwoBridgeAdvantage(s, Jugador);
+        int criticalPointAdvantage = calculateCriticalPoints(s, Jugador, JugadorEnemic);
+        //int boardControl = calculateBoardControl(s, Jugador, JugadorEnemic);
+
+        
+        return PlayerEvaluation - EnemicEvaluation + twoBridgeAdvantage + criticalPointAdvantage /*+ boardControl*/;
     }
-    */
     
     /**
-     * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
-     * de joc.
+     * Retorna el nom del jugador que s'utlilitza per visualització a la UI
+     *
+     * @return Nom del jugador
      */
     @Override
     public String getName() {
         return name;
     }
+    
+    public int calculateTwoBridgeAdvantage(HexGameStatus s, PlayerType jugador) {
+        int advantage = 0;
+        for (int i = 0; i < s.getSize(); i++) {
+            for (int j = 0; j < s.getSize(); j++) {
+                Point current = new Point(i, j);
+                if (s.getPos(current) == PlayerType.getColor(jugador)) {
+                    // Evaluar si hay "dos-puentes" válidos desde este punto
+                    for (int[] offset : new int[][]{{2, 0}, {0, 2}, {2, -2}, {-2, 2}, {2, 2}, {-2, -2}}) {
+                        Point candidate = new Point(i + offset[0], j + offset[1]);
+                        if (isValidTwoBridge(s, current, candidate, jugador)) {
+                            advantage += 10; // Beneficio por un dos-puentes
+                        }
+                    }
+                }
+            }
+        }
+        return advantage;
+    }
 
+    public boolean isValidTwoBridge(HexGameStatus s, Point p1, Point p2, PlayerType jugador) {
+        if (!isWithinBounds(s, p2)) return false;
+        Point midpoint = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+        return s.getPos(p2) == 0 && s.getPos(midpoint) == 0;
+    }
+
+    public boolean isWithinBounds(HexGameStatus s, Point p) {
+        return p.x >= 0 && p.x < s.getSize() && p.y >= 0 && p.y < s.getSize();
+    }
+
+    public int calculateCriticalPoints(HexGameStatus s, PlayerType jugador, PlayerType enemic) {
+        int advantage = 0;
+        
+        byte[][] boardAux = new byte[s.getSize()][s.getSize()];
+        
+        for (int i = 0; i < s.getSize(); ++i) {
+            for (int j = 0; j < s.getSize(); ++j) {
+                boardAux[j][i] = (byte) s.getPos(i, j);
+            }
+        }
+        
+        for (int i = 0; i < s.getSize(); i++) {
+            for (int j = 0; j < s.getSize(); j++) {
+                Point current = new Point(i, j);
+                if (s.getPos(current) == 0) {
+                    // Evaluar si este punto es crítico para ambos jugadores
+                    HexGameStatus auxBoardJugador = new HexGameStatus(boardAux, jugador);
+                    auxBoardJugador.placeStone(current);
+                    int jugadorDistance = new Dijkstra(auxBoardJugador).getDistance(jugador);
+
+                    HexGameStatus auxBoardEnemic = new HexGameStatus(boardAux, enemic);
+                    auxBoardEnemic.placeStone(current);
+                    int enemicDistance = new Dijkstra(auxBoardEnemic).getDistance(enemic);
+
+                    if (jugadorDistance < enemicDistance) {
+                        advantage += 5; // Beneficio por un punto crítico favorable
+                    } else if (jugadorDistance > enemicDistance) {
+                        advantage -= 5; // Penalización si el punto es favorable al enemigo
+                    }
+                }
+            }
+        }
+        
+        return advantage;
+    }
+
+    /*
+    public int calculateBoardControl(HexGameStatus s, PlayerType jugador, PlayerType enemic) {
+        int controlScore = 0;
+        for (int i = 0; i < s.getSize(); i++) {
+            for (int j = 0; j < s.getSize(); j++) {
+                Point current = new Point(i, j);
+                if (s.getPos(current) == 0) {
+                    int playerProximity = calculateProximityScore(s, current, jugador);
+                    int enemicProximity = calculateProximityScore(s, current, enemic);
+                    controlScore += playerProximity - enemicProximity;
+                }
+            }
+        }
+        return controlScore;
+    }
+
+    public int calculateProximityScore(HexGameStatus s, Point p, PlayerType jugador) {
+        int proximityScore = 0;
+        for (int[] dir : new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}}) {
+            Point neighbor = new Point(p.x + dir[0], p.y + dir[1]);
+            if (isWithinBounds(s, neighbor) && s.getPos(neighbor) == PlayerType.getColor(jugador)) {
+                proximityScore += 1; // Más peso a celdas cercanas ocupadas por el jugador
+            }
+        }
+        return proximityScore;
+    }
+    */
 }

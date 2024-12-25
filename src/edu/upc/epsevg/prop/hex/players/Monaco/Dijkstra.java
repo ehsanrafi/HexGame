@@ -16,20 +16,24 @@ import java.util.Set;
  */
 public class Dijkstra extends HexGameStatus {
     private final HexGameStatus hgs;
-    private final PlayerType p;
+    //private final PlayerType pJugador;
+    //private final PlayerType pEnemic;
     
-    private static final int START_NODE = -1;
-    private static final int END_NODE = -2;
+    //private static final int START_NODE = -1;
+    //private static final int END_NODE = -2;
     
-    public Dijkstra(HexGameStatus hgs, PlayerType p) {
+    public Dijkstra(HexGameStatus hgs) {
         super(hgs);
         this.hgs = hgs;
-        this.p = p;
+        //this.pJugador = p;
+        //this.pEnemic = PlayerType.opposite(p);
     }
     
+    /*
     public int shortestPath() {
         return getDistance(new Point(START_NODE, START_NODE), new Point(END_NODE, END_NODE));
     }
+    */
     
     /*
     public List<Point> getTopBorderNodes(HexGameStatus hgs) {
@@ -97,7 +101,7 @@ public class Dijkstra extends HexGameStatus {
         return rightBorder;
     }
 
-    public int getDistance(Point sPoint, Point tPoint) {
+    public int getDistance(PlayerType p) {
         int mida = hgs.getSize();
         int[][] dist = new int[mida][mida];
         boolean[][] visited = new boolean[mida][mida];

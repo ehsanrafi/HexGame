@@ -41,7 +41,7 @@ public class UnitTesting {
         byte[][] board = {
             { 1, 0, 0 , -1},
               { 1, 0, -1, 0},
-                { 1, 1, -1, 0},
+                { -1, 1, -1, 0},
                   { 0, 0, 0, 0}
         };
         
@@ -61,8 +61,8 @@ public class UnitTesting {
         //PLAYER1 = 1 : PLAYER2 : -1
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
         //PLAYER1 - LADOS VERTICALES (IZQUIERDA Y DERECHA)
-        //Dijkstra dGraf = new Dijkstra(gs);
-        System.out.println(gs.getMoves());
+        Dijkstra dGraf = new Dijkstra(gs);
+        //System.out.println(gs.getMoves());
         
         /*
         byte[][] boardAux = new byte[gs.getSize()][gs.getSize()];
@@ -81,21 +81,20 @@ public class UnitTesting {
             System.out.println();
         }
         */
-        /*
+        
         int nJugador = dGraf.getDistance(PlayerType.PLAYER1);
         //PLAYER2 - LADOS HORIZONTALES - (ARRIBA Y ABAJO)
         int nEnemic = dGraf.getDistance(PlayerType.PLAYER2);
         
         
-        int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
-        int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
+        //int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
+        //int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
         
-        System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
+        //System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
         System.out.println("Distance Jugador: " + nJugador);
         System.err.println("Distance Enemic: " + nEnemic);
         if(gs.isGameOver() && gs.GetWinner() == PlayerType.PLAYER1) {
             System.out.println("Guanyador PLAYER1");
         }
-        */
     }
 }

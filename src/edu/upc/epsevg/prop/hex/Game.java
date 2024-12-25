@@ -28,12 +28,12 @@ public class Game {
                 
                 //IPlayer player1 = new H_E_X_Player(2/*GB*/);
                 //IPlayer player1 = new RandomPlayer("Random");
-                IPlayer player1 = new Monaco("Monaco2023", true, 8);
+                IPlayer player1 = new Monaco("Monaco2023", true, 4);
                 
                 //IPlayer player2 = new Monaco("Monaco2023", false, 8);
                 IPlayer player2 = new H_E_X_Player(2/*GB*/);
                                 
-                new Board(player1 , player2, 4 /*mida*/,  10/*s*/, false);
+                new Board(player1 , player2, 9 /*mida*/,  10/*s*/, false);
              }
         });
     }

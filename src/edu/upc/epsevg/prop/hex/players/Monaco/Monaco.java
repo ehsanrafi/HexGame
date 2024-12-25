@@ -34,14 +34,6 @@ public class Monaco implements IPlayer, IAuto {
         this.name = name;
         this.mode = m;
         this.profunditat = prof;
-        this.jugadesExplorades = 0;
-        
-        if(m) {
-            this.profMax = 0;
-        }/* else {
-            this.profMax = prof;
-        }
-        */
     }
     
     /**
@@ -50,8 +42,7 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public void timeout() {
-        this.timeout = true;
-        
+        timeout = true;  
     }
     
     /**
@@ -63,9 +54,7 @@ public class Monaco implements IPlayer, IAuto {
      */
     @Override
     public PlayerMove move(HexGameStatus s) {
-        if(mode) {
-            profMax = 0;
-        }
+        profMax = 0;
         timeout = false;
         jugadesExplorades = 0;
         int valorMesAlt = Integer.MIN_VALUE;
@@ -80,59 +69,42 @@ public class Monaco implements IPlayer, IAuto {
                 valorMesAlt = Integer.MIN_VALUE;
                 valor = Integer.MIN_VALUE;
                 
-                for (int i = 0; i < s.getSize() && !timeout; ++i) {
-                    for (int j = 0; j < s.getSize() && !timeout; ++j) {
-                        if (s.getPos(new Point(i, j)) == 0 && !timeout) {
-                            HexGameStatus AuxBoard = new HexGameStatus(s);
-                            AuxBoard.placeStone(new Point(i, j));
-                            
-                            valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual - 1, false);
-                            
-                            if (valor > valorMesAlt && !timeout) {
-                                valorMesAlt = valor;
-                                puntActual = new Point(i, j);
-                            }
-                        }
+                for (MoveNode p : s.getMoves()) {
+                    if(timeout) {
+                        break;
                     }
+                    
+                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    AuxBoard.placeStone(p.getPoint());
+                    
+                    valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual - 1, false);
+                    
+                    if (valor > valorMesAlt && !timeout) {
+                        valorMesAlt = valor;
+                        puntActual = p.getPoint();
+                    }
+                    
                 }
                 
                 if (!timeout) {
                     puntOptim = puntActual;
-                    profMax = pActual;
+                    ++profMax;
                 }
             }
         } else {
-            for (int i = 0; i < s.getSize(); ++i) {
-                for (int j = 0; j < s.getSize(); ++j) {
-                    if (s.getPos(new Point(i, j)) == 0) {
-                        HexGameStatus AuxBoard = new HexGameStatus(s);
-                        AuxBoard.placeStone(new Point(i, j));
-                        
-                        valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+            for (MoveNode p : s.getMoves()) {
+                HexGameStatus AuxBoard = new HexGameStatus(s);
+                AuxBoard.placeStone(p.getPoint());
 
-                        if (valor > valorMesAlt) {
-                            valorMesAlt = valor;
-                            puntOptim = new Point(i, j);
-                        }
-                    }
+                valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
+
+                if (valor > valorMesAlt) {
+                    valorMesAlt = valor;
+                    puntOptim = p.getPoint();
                 }
             }
         }
         
-        /*
-        // Garantim que es retorna un moviment vàlid
-        if (puntOptim == null) {
-            for (int i = 0; i < s.getSize(); ++i) {
-                for (int j = 0; j < s.getSize(); ++j) {
-                    if (s.getPos(new Point(i, j)) == 0) {
-                        puntOptim = new Point(i, j);
-                        break;
-                    }
-                }
-                if (puntOptim != null) break;
-            }
-        }
-        */
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
     }
 
@@ -140,10 +112,10 @@ public class Monaco implements IPlayer, IAuto {
         if (timeout && mode) {
             return 0;
         }
-        
-        if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
 
         if(s.isGameOver() || profunditat == 0) {
+            if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
+            
             if (s.isGameOver()) {
                 return (s.GetWinner() == Jugador) ? 10000 : -10000;
             } else {
@@ -154,23 +126,25 @@ public class Monaco implements IPlayer, IAuto {
         
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
-        for (int i = 0; i < s.getSize(); ++i) {
-            for (int j = 0; j < s.getSize(); ++j) {
-                if(s.getPos(i, j) == 0) {
-                    HexGameStatus AuxBoard = new HexGameStatus(s);
-                    AuxBoard.placeStone(new Point(i, j));
+        for (MoveNode p : s.getMoves()) {
+            HexGameStatus AuxBoard = new HexGameStatus(s);
+            AuxBoard.placeStone(p.getPoint());
+            
+            if(maxJugador) {
+               valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
+               if (beta <= valor) {
+                   return valor;
+               }
 
-                    if(maxJugador) {
-                        valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
-                        alfa = Math.max(alfa, valor); 
-                    } else {
-                        valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
-                        beta = Math.min(beta, valor);
-                    }
+               alfa = Math.max(alfa, valor); 
+           } else {
+               valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
+               if (valor <= alfa) {
+                   return valor;
+               }
 
-                    if (alfa >= beta) break;
-                }
-            }
+               beta = Math.min(beta, valor);
+           }   
         }
         
         return valor;
@@ -182,18 +156,6 @@ public class Monaco implements IPlayer, IAuto {
         
         int PlayerScore = dGrafJugador.getDistance(Jugador);
         int EnemicScore = dGrafEnemic.getDistance(JugadorEnemic);
-        
-        
-        /*
-        // Nunca llegamos aquí, no?
-        if(PlayerScore == Integer.MAX_VALUE) {
-            return -1000;
-        } 
-        
-        if(EnemicScore == Integer.MAX_VALUE) {
-            return 1000;
-        } 
-        */
         
         int PlayerEvaluation = Math.max(1, 100 - PlayerScore /* + BonusCamino?? */);
         int EnemicEvaluation = Math.max(1, 100 - EnemicScore);
@@ -218,16 +180,13 @@ public class Monaco implements IPlayer, IAuto {
     
     public int calculateTwoBridgeAdvantage(HexGameStatus s, PlayerType jugador) {
         int advantage = 0;
-        for (int i = 0; i < s.getSize(); i++) {
-            for (int j = 0; j < s.getSize(); j++) {
-                Point current = new Point(i, j);
-                if (s.getPos(current) == PlayerType.getColor(jugador)) {
-                    // Evaluar si hay "dos-puentes" válidos desde este punto
-                    for (int[] offset : new int[][]{{2, 0}, {0, 2}, {2, -2}, {-2, 2}, {2, 2}, {-2, -2}}) {
-                        Point candidate = new Point(i + offset[0], j + offset[1]);
-                        if (isValidTwoBridge(s, current, candidate, jugador)) {
-                            advantage += 10; // Beneficio por un dos-puentes
-                        }
+        
+        for (MoveNode p : s.getMoves()) {
+            if(s.getPos(p.getPoint()) == PlayerType.getColor(jugador)) {
+                for (int[] offset : new int[][]{{2, 0}, {0, 2}, {2, -2}, {-2, 2}, {2, 2}, {-2, -2}}) {
+                    Point candidate = new Point(p.getPoint().x + offset[0], p.getPoint().y + offset[1]);
+                    if (isValidTwoBridge(s, p.getPoint(), candidate, jugador)) {
+                        advantage += 15; // Beneficio por un dos-puentes
                     }
                 }
             }
@@ -256,43 +215,33 @@ public class Monaco implements IPlayer, IAuto {
             }
         }
         
-        for (int i = 0; i < s.getSize(); i++) {
-            for (int j = 0; j < s.getSize(); j++) {
-                Point current = new Point(i, j);
-                if (s.getPos(current) == 0) {
-                    // Evaluar si este punto es crítico para ambos jugadores
-                    HexGameStatus auxBoardJugador = new HexGameStatus(boardAux, jugador);
-                    auxBoardJugador.placeStone(current);
-                    int jugadorDistance = new Dijkstra(auxBoardJugador).getDistance(jugador);
+        for (MoveNode p : s.getMoves()) {
+            // Evaluar si este punto es crítico para ambos jugadores
+            HexGameStatus auxBoardJugador = new HexGameStatus(boardAux, jugador);
+            auxBoardJugador.placeStone(p.getPoint());
+            int jugadorDistance = new Dijkstra(auxBoardJugador).getDistance(jugador);
 
-                    HexGameStatus auxBoardEnemic = new HexGameStatus(boardAux, enemic);
-                    auxBoardEnemic.placeStone(current);
-                    int enemicDistance = new Dijkstra(auxBoardEnemic).getDistance(enemic);
+            HexGameStatus auxBoardEnemic = new HexGameStatus(boardAux, enemic);
+            auxBoardEnemic.placeStone(p.getPoint());
+            int enemicDistance = new Dijkstra(auxBoardEnemic).getDistance(enemic);
 
-                    if (jugadorDistance < enemicDistance) {
-                        advantage += 5; // Beneficio por un punto crítico favorable
-                    } else if (jugadorDistance > enemicDistance) {
-                        advantage -= 5; // Penalización si el punto es favorable al enemigo
-                    }
-                }
+            if (jugadorDistance < enemicDistance) {
+                advantage += 5; // Beneficio por un punto crítico favorable
+            } else if (jugadorDistance > enemicDistance) {
+                advantage -= 5; // Penalización si el punto es favorable al enemigo
             }
         }
-        
         return advantage;
     }
 
     /*
     public int calculateBoardControl(HexGameStatus s, PlayerType jugador, PlayerType enemic) {
         int controlScore = 0;
-        for (int i = 0; i < s.getSize(); i++) {
-            for (int j = 0; j < s.getSize(); j++) {
-                Point current = new Point(i, j);
-                if (s.getPos(current) == 0) {
-                    int playerProximity = calculateProximityScore(s, current, jugador);
-                    int enemicProximity = calculateProximityScore(s, current, enemic);
-                    controlScore += playerProximity - enemicProximity;
-                }
-            }
+        
+        for (MoveNode p : s.getMoves()) {
+            int playerProximity = calculateProximityScore(s, p.getPoint(), jugador);
+            int enemicProximity = calculateProximityScore(s, p.getPoint(), enemic);
+            controlScore += playerProximity - enemicProximity;
         }
         return controlScore;
     }
@@ -302,7 +251,7 @@ public class Monaco implements IPlayer, IAuto {
         for (int[] dir : new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, -1}}) {
             Point neighbor = new Point(p.x + dir[0], p.y + dir[1]);
             if (isWithinBounds(s, neighbor) && s.getPos(neighbor) == PlayerType.getColor(jugador)) {
-                proximityScore += 1; // Más peso a celdas cercanas ocupadas por el jugador
+                proximityScore += 2; // Más peso a celdas cercanas ocupadas por el jugador
             }
         }
         return proximityScore;

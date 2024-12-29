@@ -14,11 +14,11 @@ import java.util.Set;
  *
  * @author Ehsan i Iván
  */
-public class Dijkstra extends HexGameStatus {
+public class Dijkstra {
     private final HexGameStatus hgs;
     
     public Dijkstra(HexGameStatus hgs) {
-        super(hgs);
+        //super(hgs);
         this.hgs = hgs;
     }
     

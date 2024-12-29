@@ -62,11 +62,10 @@ public class Monaco implements IPlayer, IAuto {
                 return new PlayerMove(new Point(s.getSize() / 2, s.getSize() / 2), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
             }
         } else {
-            if (s.getPos(new Point((s.getSize() / 2) + 1, (s.getSize() / 2) + 1)) == 0) {
-                return new PlayerMove(new Point((s.getSize() / 2), (s.getSize() / 2)), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+            if (s.getPos(new Point((s.getSize() / 2 + 1), (s.getSize() / 2) + 1)) == 0) {
+                return new PlayerMove(new Point((s.getSize() / 2 ) + 1, (s.getSize() / 2) + 1), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
             }
         }
-        
         
         for (MoveNode n : s.getMoves()) {
             HexGameStatus boardAux = new HexGameStatus(s);

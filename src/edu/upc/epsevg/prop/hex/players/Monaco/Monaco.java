@@ -62,8 +62,8 @@ public class Monaco implements IPlayer, IAuto {
                 return new PlayerMove(new Point(s.getSize() / 2, s.getSize() / 2), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
             }
         } else {
-            if (s.getPos(new Point((s.getSize() / 2 + 1), (s.getSize() / 2) + 1)) == 0) {
-                return new PlayerMove(new Point((s.getSize() / 2 ) + 1, (s.getSize() / 2) + 1), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+            if (s.getPos(new Point((s.getSize() / 2 - 1), (s.getSize() / 2))) == 0) {
+                return new PlayerMove(new Point((s.getSize() / 2 - 1), (s.getSize() / 2)), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
             }
         }
         
@@ -71,7 +71,7 @@ public class Monaco implements IPlayer, IAuto {
             HexGameStatus boardAux = new HexGameStatus(s);
             boardAux.placeStone(n.getPoint());
             
-            if(s.isGameOver() && s.GetWinner() == Jugador) {
+            if (s.GetWinner() == Jugador) {
                 return new PlayerMove(n.getPoint(), jugadesExplorades, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
             }
             ++jugadesExplorades;
@@ -130,7 +130,7 @@ public class Monaco implements IPlayer, IAuto {
             if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
             
             if (s.isGameOver()) {
-                return (s.GetWinner() == Jugador) ? 100000 : -100000;
+                return (s.GetWinner() == Jugador) ? 1000000 : -1000000;
             } else {
                 ++jugadesExplorades;
                 return getHeuristica(s);

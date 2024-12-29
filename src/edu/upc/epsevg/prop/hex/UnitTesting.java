@@ -22,29 +22,29 @@ import java.util.Queue;
  */
 public class UnitTesting {
     public static void main(String[] args) {
-        /*
+        
         byte[][] board = {
         //X   0  1  2  3  4  5  6  7  8
-            { 1, 1, 1, 1, 1, 1, 1, 1, 0},                     // 0   Y
-              { 1, 0, 0, 0, 0, 0, 0, 0, 0},                    // 1
-                { 1, 0, 0, 0, 0, 0, 0, 0, 0},                  // 2
-                  { 1, 0, 0, 0, 0, 0, 0, 0, 0},                // 3
-                    { 1, 0, 0, 0, 0, 0, 0, 0, 0},              // 4
-                      { 1, 0, 0, 0, 0, 0, 1, 1, 1},            // 5
-                        { 1, 0, 0, 0, 0, 0, 0, 0, -1},          // 6
-                          { 1, 0, 0, 0, 0, 0, 0, 0, -1},        // 7
+            { 0, 0, 0, 0, 0, 0, 0, 0, 1},                     // 0   Y
+              { 0, 0, 0, 0, 0, 0, 0, 1, 0},                    // 1
+                { 0, 0, 0, 0, 0, 0, 1, 0, 0},                  // 2
+                  { 0, 0, 0, 0, 0, 1, 0, 0, 0},                // 3
+                    { 0, 0, 0, 0, 1, 0, 0, 0, 0},              // 4
+                      { 0, 0, 1, 1, 0, 0, 0, 0, 0},            // 5
+                        { 0, 1, 0, 0, 0, 0, 0, 0, -1},          // 6
+                          { 0, 0, 0, 0, 0, 0, 0, 0, -1},        // 7
                             { 0, 0, 0, 0, 0, 0, 0, 0, -1}       // 8    Y
         };
-        */
         
         
+        /*
         byte[][] board = {
             { 1, 0, 0 , -1},
               { 0, 0, 0, 1},
                 { 1, 1, 1, -1},
                   { 0, 1, -1, -1}
         };
-        
+        */
         
         
         //System.out.println("ocupa: " + board[0][1]);
@@ -61,8 +61,9 @@ public class UnitTesting {
         //PLAYER1 = 1 : PLAYER2 : -1
         HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1);
         //PLAYER1 - LADOS VERTICALES (IZQUIERDA Y DERECHA)
-        //Dijkstra dGraf = new Dijkstra(gs);
-        //System.out.println(gs.getMoves());
+        
+        Dijkstra dGraf = new Dijkstra(gs);
+        System.out.println(gs.getMoves());
         
         /*
         byte[][] boardAux = new byte[gs.getSize()][gs.getSize()];
@@ -82,9 +83,9 @@ public class UnitTesting {
         }
         */
         
-        //int nJugador = dGraf.getDistance(PlayerType.PLAYER1);
+        int nJugador = dGraf.getDistance(PlayerType.PLAYER1);
         //PLAYER2 - LADOS HORIZONTALES - (ARRIBA Y ABAJO)
-        //int nEnemic = dGraf.getDistance(PlayerType.PLAYER2);
+        int nEnemic = dGraf.getDistance(PlayerType.PLAYER2);
         
         //System.out.println(gs.getMoves());
         //System.out.println(gs.getNeigh(new Point(0, 0)));
@@ -92,15 +93,15 @@ public class UnitTesting {
         //System.out.println(gs.isGameOver());
         
         
-        //int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
-        //int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
+        int PlayerEvaluation = Math.max(1, 100 - Math.abs(nJugador));
+        int EnemicEvaluation = Math.max(1, 100 - Math.abs(nEnemic));
         
-        //System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
-        //System.out.println("Distance Jugador: " + nJugador);
-        //System.err.println("Distance Enemic: " + nEnemic);
+        System.out.println("Heuristic: " + (PlayerEvaluation - EnemicEvaluation));
+        System.out.println("Distance Jugador: " + nJugador);
+        System.err.println("Distance Enemic: " + nEnemic);
         //if(gs.isGameOver() && gs.GetWinner() == PlayerType.PLAYER1) {
             //System.out.println("Guanyador PLAYER1");
         //}
-        System.out.println(9 / 2);
+        //System.out.println(9 / 2);
     }
 }

@@ -1,9 +1,9 @@
 package edu.upc.epsevg.prop.hex.players.Monaco;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
+import edu.upc.epsevg.prop.hex.MoveNode;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
-import java.util.ArrayList;
 
 /**
  *
@@ -26,7 +26,7 @@ public class Heuristica {
         int PlayerScore = dGraf.getDistance(Jugador);
         int EnemicScore = dGraf.getDistance(PlayerType.opposite(Jugador));
         
-        int twoBridgeEvaluation = evaluateTwoBridgeState();
+        int twoBridgeEvaluation = evaluateTwoBridgeState(Jugador);
         /**/
         
         int PlayerEvaluation = Math.max(1, 100 - PlayerScore);
@@ -35,9 +35,9 @@ public class Heuristica {
         return 12 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
     }
     
-    public int evaluateTwoBridgeState() {
+    public int evaluateTwoBridgeState(PlayerType Player) {
         int v = 0;
-        //int enemyColor = PlayerType.getColor(PlayerType.opposite(Jugador));
+        int enemyColor = PlayerType.getColor(PlayerType.opposite(Player));
         int[][] directions = {
             {-1, -1}, {1, -2}, {2, -1}, {1, 1}, {-1, 2}, {-2, 1}
         };
@@ -45,11 +45,11 @@ public class Heuristica {
         for (int i = 0; i < s.getSize(); ++i) {
             for (int j = 0; j < s.getSize(); ++j) {
                 Point pCurrent = new Point(i, j);
-                if (s.getPos(pCurrent) == PlayerType.getColor(Jugador)) {
+                if (s.getPos(pCurrent) == PlayerType.getColor(Player)) {
                     for (int[] dir : directions) {
                         int x = i + dir[0];
                         int y = j + dir[1];
-                        if (x >= 0 && x < s.getSize() && y >= 0 && y < s.getSize() && s.getPos(x, y) == PlayerType.getColor(Jugador)) {
+                        if (x >= 0 && x < s.getSize() && y >= 0 && y < s.getSize() && s.getPos(x, y) == PlayerType.getColor(Player)) {
                             if (dir[0] == -1 && dir[1] == -1) {
                                 v += (s.getPos(i, j - 1) == 0 && s.getPos(i - 1, j) == 0) ? 2 : 0;
                             }

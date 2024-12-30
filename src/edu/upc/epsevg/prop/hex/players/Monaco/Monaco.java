@@ -42,17 +42,20 @@ public class Monaco implements IPlayer, IAuto {
      * Decideix el moviment del jugador donat un tauler i un color de peça que
      * ha de posar.
      *
-     * @param s Tauler i estat actual de joc.
+     * @param hgs Tauler i estat actual de joc.
      * @return el moviment que fa el jugador.
      */
     @Override
-    public PlayerMove move(HexGameStatus s) {
+    public PlayerMove move(HexGameStatus hgs) {
         profMax = 0;
         timeout = false;
         jugadesExplorades = 0;
         int valorMesAlt = Integer.MIN_VALUE;
         int valor = Integer.MIN_VALUE;
         Point puntOptim = null;
+        
+        MyStatus s = new MyStatus(hgs);
+        
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
         
@@ -68,7 +71,7 @@ public class Monaco implements IPlayer, IAuto {
             }
             
             for (MoveNode n : s.getMoves()) {
-                HexGameStatus boardAux = new HexGameStatus(s);
+                MyStatus boardAux = new MyStatus(s);
                 boardAux.placeStone(n.getPoint());
 
                 ++jugadesExplorades;
@@ -88,7 +91,7 @@ public class Monaco implements IPlayer, IAuto {
                         break;
                     }
                     
-                    HexGameStatus AuxBoard = new HexGameStatus(s);
+                    MyStatus AuxBoard = new MyStatus(s);
                     AuxBoard.placeStone(p.getPoint());
                     
                     valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, pActual - 1, false);
@@ -106,7 +109,7 @@ public class Monaco implements IPlayer, IAuto {
             }
         } else {
             for (MoveNode p : s.getMoves()) {
-                HexGameStatus AuxBoard = new HexGameStatus(s);
+                MyStatus AuxBoard = new MyStatus(s);
                 AuxBoard.placeStone(p.getPoint());
 
                 valor = minimaxAlfaBeta(AuxBoard, Integer.MIN_VALUE, Integer.MAX_VALUE, profunditat - 1, false);
@@ -121,7 +124,7 @@ public class Monaco implements IPlayer, IAuto {
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
     }
 
-    public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
+    public int minimaxAlfaBeta(MyStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
         if (timeout && mode) {
             return 0;
         }
@@ -140,7 +143,7 @@ public class Monaco implements IPlayer, IAuto {
         int valor = maxJugador ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
         for (MoveNode p : s.getMoves()) {
-            HexGameStatus AuxBoard = new HexGameStatus(s);
+            MyStatus AuxBoard = new MyStatus(s);
             AuxBoard.placeStone(p.getPoint());
             
             if(maxJugador) {
@@ -159,7 +162,7 @@ public class Monaco implements IPlayer, IAuto {
         return valor;
     }
     
-    public int getHeuristica(HexGameStatus s) {
+    public int getHeuristica(MyStatus s) {
         Heuristica h = new Heuristica(s, Jugador);
         
         return h.getEvaluation(s);

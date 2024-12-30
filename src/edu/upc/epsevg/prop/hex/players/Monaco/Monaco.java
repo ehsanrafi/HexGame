@@ -11,6 +11,10 @@ import edu.upc.epsevg.prop.hex.SearchType;
 import java.awt.Point;
 
 /**
+ * Classe que implementa un jugador automàtic per al joc de Hex utilitzant
+ * estratègies basades en Minimax amb poda alfa-beta i cerca iterativa si està
+ * habilitada.
+ * 
  * @author Ehsan i Iván
  */
 public class Monaco implements IPlayer, IAuto {
@@ -23,6 +27,13 @@ public class Monaco implements IPlayer, IAuto {
     private long jugadesExplorades;
     private int profMax;
     
+    /**
+     * Constructor de la classe Monaco.
+     * 
+     * @param name Nom del jugador.
+     * @param m Mode de cerca (true per a cerca iterativa, false per a cerca fixa).
+     * @param prof Profunditat màxima de la cerca fixa.
+     */
     public Monaco(String name, boolean m, int prof) {
         this.name = name;
         this.mode = m;
@@ -56,7 +67,7 @@ public class Monaco implements IPlayer, IAuto {
         Jugador = s.getCurrentPlayer();
         JugadorEnemic = PlayerType.opposite(Jugador);
         
-        // Si no hay ficha en el centro, poner.
+        // Si no hi ha fitxa al centre, posar-ne una.
             if (s.getSize() % 2 != 0) {
                 if (s.getPos(new Point(s.getSize() / 2, s.getSize() / 2)) == 0) {
                     return new PlayerMove(new Point(s.getSize() / 2, s.getSize() / 2), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
@@ -76,7 +87,8 @@ public class Monaco implements IPlayer, IAuto {
                     return new PlayerMove(n.getPoint(), jugadesExplorades, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
                 }
             }
-        
+            
+        // Cerca del millor moviment.
         if (mode) {
             for (int pActual = 1; !s.isGameOver() && !timeout; ++pActual) {
                 Point puntActual = null;
@@ -84,7 +96,7 @@ public class Monaco implements IPlayer, IAuto {
                 valor = Integer.MIN_VALUE;
                 
                 for (MoveNode p : s.getMoves()) {
-                    if(timeout) {
+                    if (timeout) {
                         break;
                     }
                     
@@ -120,14 +132,24 @@ public class Monaco implements IPlayer, IAuto {
         
         return new PlayerMove(puntOptim, jugadesExplorades, profMax, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
     }
-
+    
+    /**
+     * Implementa l'algorisme Minimax amb poda alfa-beta.
+     * 
+     * @param s Estat actual del joc.
+     * @param alfa Valor alfa per a la poda.
+     * @param beta Valor beta per a la poda.
+     * @param profunditat Profunditat restant per explorar.
+     * @param maxJugador Indica si el jugador actual és el maximitzador.
+     * @return Valor heurístic del moviment.
+     */
     public int minimaxAlfaBeta(HexGameStatus s, int alfa, int beta, int profunditat, boolean maxJugador) {
         if (timeout && mode) {
             return 0;
         }
 
-        if(s.isGameOver() || profunditat == 0) {
-            if(!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
+        if (s.isGameOver() || profunditat == 0) {
+            if (!mode) profMax = Math.max(profMax, this.profunditat - profunditat);
             
             if (s.isGameOver()) {
                 return (s.GetWinner() == Jugador) ? 1000000 : -1000000;
@@ -143,7 +165,7 @@ public class Monaco implements IPlayer, IAuto {
             HexGameStatus AuxBoard = new HexGameStatus(s);
             AuxBoard.placeStone(p.getPoint());
             
-            if(maxJugador) {
+            if (maxJugador) {
                valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
                alfa = Math.max(alfa, valor); 
            } else {
@@ -159,6 +181,12 @@ public class Monaco implements IPlayer, IAuto {
         return valor;
     }
     
+    /**
+     * Calcula l'heurística d'un estat de joc donat.
+     * 
+     * @param s Estat actual del joc.
+     * @return Valor heurístic calculat.
+     */
     public int getHeuristica(HexGameStatus s) {
         Heuristica h = new Heuristica(s, Jugador);
         

@@ -1,25 +1,54 @@
 package edu.upc.epsevg.prop.hex.players.Monaco;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
-import edu.upc.epsevg.prop.hex.MoveNode;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
 
 /**
+ * Classe que implementa la lògica heurística per avaluar l'estat d'un
+ * joc de Hex. Aquesta classe calcula una puntuació heurística basada en la
+ * distància del jugador a la meta i factors estratègics com els dos punts de pont.
  *
  * @author Ehsan i Iván
  */
 public class Heuristica {
+    /**
+     * Estat actual del joc.
+     */
     private final HexGameStatus s;
+    
+    /**
+     * Tipus del jugador actual.
+     */
     private final PlayerType Jugador;
-
+    
+    //private static final HashMap<Long, Integer> evaluationCache = new HashMap<>();
+    
+    /**
+     * Constructor de la classe Heuristica.
+     *
+     * @param hgs Estat del joc en un moment donat.
+     * @param p Tipus del jugador actual.
+     */
     public Heuristica(HexGameStatus hgs, PlayerType p) {
         this.s = hgs;
         this.Jugador = p;
     }
 
+    /**
+     * Calcula l'avaluació heurística de l'estat actual del joc.
+     *
+     * @param s Estat actual del joc.
+     * @return Un enter que representa la puntuació heurística del jugador.
+     */
     public int getEvaluation(HexGameStatus s) {
+        /*
+        long hash = s.getZobristHash();
         
+        if (evaluationCache.containsKey(hash)) {
+            return evaluationCache.get(hash);
+        }
+        */
         Dijkstra dGraf = new Dijkstra(s);
         
         int PlayerScore = dGraf.getDistance(Jugador);
@@ -30,9 +59,19 @@ public class Heuristica {
         int PlayerEvaluation = Math.max(1, 100 - PlayerScore);
         int EnemicEvaluation = Math.max(1, 100 - EnemicScore);
         
+        //evaluationCache.put(hash, 16 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation);
+        
         return 16 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
     }
     
+    /**
+     * Avalua l'estat dels "dos punts de pont" del jugador donat.
+     * Aquesta heurística considera la connexió entre dues cel·les
+     * del mateix color que poden connectar-se a través d'una estructura de pont.
+     *
+     * @param Player Tipus del jugador (jugador actual).
+     * @return Un enter que representa la puntuació de l'estat dels dos punts de pont.
+     */
     public int evaluateTwoBridgeState(PlayerType Player) {
         int v = 0;
         int[][] directions = {

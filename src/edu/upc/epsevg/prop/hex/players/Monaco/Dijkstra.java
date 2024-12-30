@@ -16,7 +16,6 @@ public class Dijkstra {
     private final HexGameStatus hgs;
     
     public Dijkstra(HexGameStatus hgs) {
-        //super(hgs);
         this.hgs = hgs;
     }
     
@@ -88,7 +87,6 @@ public class Dijkstra {
             if (visited[pCurrent.x][pCurrent.y]) continue;
             visited[pCurrent.x][pCurrent.y] = true;
             
-            // Conectar al END_NODE si estamos en el borde final
             if (endBorder.contains(pCurrent)) {
                 return nCurrent.getDistance();
             }
@@ -98,7 +96,7 @@ public class Dijkstra {
                 int ny = pCurrent.y + d[1];
                 
                 if (nx >= 0 && nx < mida && ny >= 0 && ny < mida && !visited[nx][ny]) {
-                    int c = (hgs.getPos(nx, ny) == 0) ? 1 : 0; //coste
+                    int c = (hgs.getPos(nx, ny) == 0) ? 1 : 0;
                     if (hgs.getPos(nx, ny) == 0 || hgs.getPos(nx, ny) == PlayerType.getColor(p)) {
                         int newDist = dist[pCurrent.x][pCurrent.y] + c;
                         if (newDist < dist[nx][ny]) {

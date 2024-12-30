@@ -22,22 +22,19 @@ public class Heuristica {
         
         Dijkstra dGraf = new Dijkstra(s);
         
-        //Numero de fichas para ganar
         int PlayerScore = dGraf.getDistance(Jugador);
         int EnemicScore = dGraf.getDistance(PlayerType.opposite(Jugador));
         
         int twoBridgeEvaluation = evaluateTwoBridgeState(Jugador);
-        /**/
         
         int PlayerEvaluation = Math.max(1, 100 - PlayerScore);
         int EnemicEvaluation = Math.max(1, 100 - EnemicScore);
         
-        return 12 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
+        return 16 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
     }
     
     public int evaluateTwoBridgeState(PlayerType Player) {
         int v = 0;
-        int enemyColor = PlayerType.getColor(PlayerType.opposite(Player));
         int[][] directions = {
             {-1, -1}, {1, -2}, {2, -1}, {1, 1}, {-1, 2}, {-2, 1}
         };

@@ -1,30 +1,24 @@
 package edu.upc.epsevg.prop.hex.players.Monaco;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
+import edu.upc.epsevg.prop.hex.MoveNode;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
-import java.util.HashMap;
 
 /**
  *
  * @author Ehsan i Iván
  */
 public class Heuristica {
-    private final MyStatus s;
+    private final HexGameStatus s;
     private final PlayerType Jugador;
-    private static final HashMap<Long, Integer> evaluationCache = new HashMap<>();
 
-    public Heuristica(MyStatus hgs, PlayerType p) {
+    public Heuristica(HexGameStatus hgs, PlayerType p) {
         this.s = hgs;
         this.Jugador = p;
     }
 
-    public int getEvaluation(MyStatus s) {
-        long hash = s.getZobristHash();
-        
-        if (evaluationCache.containsKey(hash)) {
-            return evaluationCache.get(hash);
-        }
+    public int getEvaluation(HexGameStatus s) {
         
         Dijkstra dGraf = new Dijkstra(s);
         
@@ -38,16 +32,12 @@ public class Heuristica {
         int PlayerEvaluation = Math.max(1, 100 - PlayerScore);
         int EnemicEvaluation = Math.max(1, 100 - EnemicScore);
         
-        int evaluation = 12 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
-        
-        evaluationCache.put(hash, evaluation);
-        
-        return evaluation;
+        return 12 * (PlayerEvaluation - EnemicEvaluation) + twoBridgeEvaluation;
     }
     
     public int evaluateTwoBridgeState(PlayerType Player) {
         int v = 0;
-        //int enemyColor = PlayerType.getColor(PlayerType.opposite(Player));
+        int enemyColor = PlayerType.getColor(PlayerType.opposite(Player));
         int[][] directions = {
             {-1, -1}, {1, -2}, {2, -1}, {1, 1}, {-1, 2}, {-2, 1}
         };

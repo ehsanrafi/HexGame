@@ -33,7 +33,7 @@ public class Game {
                 //IPlayer player2 = new Monaco("Monaco2023", true, 8);
                 IPlayer player2 = new H_E_X_Player(2/*GB*/);
                                 
-                new Board(player1 , player2, 9 /*mida*/,  10/*s*/, false);
+                new Board(player1 , player2, 6 /*mida*/,  10/*s*/, false);
              }
         });
     }

@@ -31,7 +31,7 @@ public class HeadlessGame {
         IPlayer player1 = new Monaco("Monaco2023", true, 8);
         IPlayer player2 = new H_E_X_Player(2/*GB*/);                    
         //IPlayer player2 = new RandomPlayer("Rando");
-        HeadlessGame game = new HeadlessGame(player1, player2, 9, 10/*s timeout*/, 5/*games*/);
+        HeadlessGame game = new HeadlessGame(player1, player2, 8, 10/*s timeout*/, 5/*games*/);
         GameResult gr = game.start();
         System.out.println(gr);
 

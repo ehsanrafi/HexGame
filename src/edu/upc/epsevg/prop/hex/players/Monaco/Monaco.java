@@ -57,25 +57,25 @@ public class Monaco implements IPlayer, IAuto {
         JugadorEnemic = PlayerType.opposite(Jugador);
         
         // Si no hay ficha en el centro, poner.
-        if (s.getSize() % 2 != 0) {
-            if (s.getPos(new Point(s.getSize() / 2, s.getSize() / 2)) == 0) {
-                return new PlayerMove(new Point(s.getSize() / 2, s.getSize() / 2), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+            if (s.getSize() % 2 != 0) {
+                if (s.getPos(new Point(s.getSize() / 2, s.getSize() / 2)) == 0) {
+                    return new PlayerMove(new Point(s.getSize() / 2, s.getSize() / 2), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+                }
+            } else {
+                if (s.getPos(new Point((s.getSize() / 2 - 1), (s.getSize() / 2))) == 0) {
+                    return new PlayerMove(new Point((s.getSize() / 2 - 1), (s.getSize() / 2)), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+                }
             }
-        } else {
-            if (s.getPos(new Point((s.getSize() / 2 - 1), (s.getSize() / 2))) == 0) {
-                return new PlayerMove(new Point((s.getSize() / 2 - 1), (s.getSize() / 2)), 1, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
-            }
-        }
-        
-        for (MoveNode n : s.getMoves()) {
-            HexGameStatus boardAux = new HexGameStatus(s);
-            boardAux.placeStone(n.getPoint());
             
-            if (s.GetWinner() == Jugador) {
-                return new PlayerMove(n.getPoint(), jugadesExplorades, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+            for (MoveNode n : s.getMoves()) {
+                HexGameStatus boardAux = new HexGameStatus(s);
+                boardAux.placeStone(n.getPoint());
+
+                ++jugadesExplorades;
+                if (boardAux.isGameOver() && boardAux.GetWinner() == Jugador) {
+                    return new PlayerMove(n.getPoint(), jugadesExplorades, 1, mode ? SearchType.MINIMAX_IDS : SearchType.MINIMAX);
+                }
             }
-            ++jugadesExplorades;
-        }
         
         if (mode) {
             for (int pActual = 1; !s.isGameOver() && !timeout; ++pActual) {
@@ -145,19 +145,9 @@ public class Monaco implements IPlayer, IAuto {
             
             if(maxJugador) {
                valor = Math.max(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, false));
-               /*
-               if (beta <= valor) {
-                   return valor;
-               }
-               */
                alfa = Math.max(alfa, valor); 
            } else {
                valor = Math.min(valor, minimaxAlfaBeta(AuxBoard, alfa, beta, profunditat - 1, true));
-               /*
-               if (valor <= alfa) {
-                   return valor;
-               }
-               */
                beta = Math.min(beta, valor);
            }
             
@@ -173,31 +163,6 @@ public class Monaco implements IPlayer, IAuto {
         Heuristica h = new Heuristica(s, Jugador);
         
         return h.getEvaluation(s);
-        
-        //Dijkstra dGraf = new Dijkstra(s);
-        
-        //int PlayerScore = dGraf.getDistance(Jugador);
-        //int EnemicScore = dGraf.getDistance(JugadorEnemic);
-        /*
-        int bridgeF = bridgeFactor(s);
-        int centerF = focusCenter(s);
-        
-        bridgeF = bridgeF * 2;
-        centerF = centerF * 2;
-        int value = bridgeF + centerF;
-
-        countConnectedNodes(s, PlayerType.getColor(Jugador));
-        int AIValue = counter;
-        counter = 0;
-        
-        countConnectedNodes(s, PlayerType.getColor(JugadorEnemic));
-        int humanValue = counter;
-        counter = 0;
-        
-        int boardState = AIValue - humanValue;
-        
-        return boardState + value /*+ boardControl;
-        */
     }
     
     /**

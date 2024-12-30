@@ -3,10 +3,8 @@ package edu.upc.epsevg.prop.hex.players.Monaco;
 import edu.upc.epsevg.prop.hex.HexGameStatus;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
